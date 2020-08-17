@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Score Keeper</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="deuce">40</string>
+    <string name="advantage">AD</string>
+    <string name="zero">0</string>
+    <string name="player_b">PLAYER B</string>
+    <string name="player_a">PLAYER A</string>
+</resources>
