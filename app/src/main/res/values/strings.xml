@@ -7,4 +7,5 @@
     <string name="zero">0</string>
     <string name="player_b">PLAYER B</string>
     <string name="player_a">PLAYER A</string>
+    <string name="ball">ball</string>
 </resources>
