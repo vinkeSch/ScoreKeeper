@@ -22,7 +22,7 @@ import kotlin.math.abs
 private const val ARG_PARAM1 = "param1"
 private const val ARG_PARAM2 = "param2"*/
 
-/**
+/*
  * A simple [Fragment] subclass.
  * Use the [MatchFragment.newInstance] factory method to
  * create an instance of this fragment.
@@ -40,6 +40,7 @@ class MatchFragment : Fragment() {
         }
     }*/
     val scores = listOf("0", "15", "30", "40")
+    val scoreMap = mapOf("0" to 0, "15" to 1, "30" to 2, "40" to 3)
     var matchScore = ""
 
     var gameScoreA = 0
@@ -73,6 +74,10 @@ class MatchFragment : Fragment() {
 
     lateinit var ballA: ImageView
     lateinit var ballB: ImageView
+
+    var currentPoint = ""
+    var pointNumber = 0
+    var scoreHistory = mutableListOf<String>()
 
     @SuppressLint("SetTextI18n")
     override fun onCreateView(
@@ -126,6 +131,13 @@ class MatchFragment : Fragment() {
             true
         }
 
+        // Undo last point
+        val iconUndo = view.findViewById<ImageView>(R.id.imageUndo)
+        iconUndo.setOnClickListener {
+            if (pointNumber == 1) Toast.makeText(requireActivity(), "First point of the match!\nLet's play!", Toast.LENGTH_SHORT).show()
+            else getPreviousScore()
+        }
+
         pointsA.setOnClickListener {
             pointWonByA()
           }
@@ -143,7 +155,115 @@ class MatchFragment : Fragment() {
             mute = !mute
         }
 
+        // Initial point
+        addPointToHistory()
+
         return view
+    }
+
+    fun getPreviousScore(){
+        val scoreValues = (scoreHistory[pointNumber-2].split(" "))
+        println(scoreValues)
+
+        when(scoreValues[0]){ // number of set playing
+            "1" -> { // 1st set
+                if(setsWonA == 1) {
+                    currentSet--
+                    setsWonA = 0
+                    set1A.setTextColor(Color.parseColor("#E9ECF5"))
+                    set1A.typeface = Typeface.SANS_SERIF
+                    currentTextSetA = set1A
+                    currentTextSetB = set1B
+                    matchScore = ""
+                }
+                else if (setsWonB == 1){
+                    currentSet--
+                    setsWonB = 0
+                    set1B.setTextColor(Color.parseColor("#E9ECF5"))
+                    set1B.typeface = Typeface.SANS_SERIF
+                    currentTextSetA = set1A
+                    currentTextSetB = set1B
+                    matchScore = ""
+                }
+                set2A.visibility = View.INVISIBLE
+                set2B.visibility = View.INVISIBLE
+                setScoreA = scoreValues[1].toInt()
+                setScoreB = scoreValues[2].toInt()
+            }
+            "2" -> { // 2nd set
+                val previousSet2A = set2A.text.toString().toInt()
+                val previousSet2B = set2B.text.toString().toInt()
+                val matchScoreIsClose = abs(previousSet2A - previousSet2B ) < 2
+                if (previousSet2A == 7 || (!matchScoreIsClose && previousSet2A >= 6)){
+                    currentSet--
+                    setsWonA--
+                    set2A.setTextColor(Color.parseColor("#E9ECF5"))
+                    set2A.typeface = Typeface.SANS_SERIF
+                    currentTextSetA = set2A
+                    currentTextSetB = set2B
+                    matchScore = matchScore.substring(0,3)
+                }
+                else if (previousSet2B == 7 || (!matchScoreIsClose && previousSet2B >= 6)){
+                    currentSet--
+                    setsWonB--
+                    set2B.setTextColor(Color.parseColor("#E9ECF5"))
+                    set2B.typeface = Typeface.SANS_SERIF
+                    currentTextSetA = set2A
+                    currentTextSetB = set2B
+                    matchScore = matchScore.substring(0,3)
+                }
+                set3A.visibility = View.INVISIBLE
+                set3B.visibility = View.INVISIBLE
+                setScoreA = scoreValues[3].toInt()
+                setScoreB = scoreValues[4].toInt()
+            }
+            else -> { // 3rd set
+                currentSet =3
+                setScoreA = scoreValues[5].toInt()
+                setScoreB = scoreValues[6].toInt()
+            }
+        }
+
+        if(!(setScoreA == 6 && setScoreB == 6 )){ // no tiebreak
+            if ((scoreValues[7] != "AD") && (scoreValues[8] != "AD") ) {
+                gameScoreA = scoreMap[scoreValues[7]] ?: error("")
+                gameScoreB = scoreMap[scoreValues[8]] ?: error("")
+            }
+            else if (scoreValues[7] == "AD") {
+                gameScoreA = 5
+                gameScoreB = 4
+            }
+            else if (scoreValues[8] == "AD") {
+                gameScoreA = 4
+                gameScoreB = 5
+            }
+        }
+        else { // tiebreak
+            gameScoreA = scoreValues[7].toInt()
+            gameScoreB = scoreValues[8].toInt()
+        }
+        // Restore fragment values
+        set1A.text = scoreValues[1]
+        set1B.text = scoreValues[2]
+        set2A.text = scoreValues[3]
+        set2B.text = scoreValues[4]
+        set3A.text = scoreValues[5]
+        set3B.text = scoreValues[6]
+        pointsA.text = scoreValues[7]
+        pointsB.text = scoreValues[8]
+        pointNumber--
+
+        servingA = scoreValues[9] == "true"
+        setIcon()
+
+        if ( setScoreA == 6 && setScoreB == 6 ) {
+            isTiebreak = true
+            minScoreToWinGame = 7
+        }
+        else {
+            isTiebreak = false
+            minScoreToWinGame = 4
+        }
     }
 
     @SuppressLint("SetTextI18n")
@@ -190,6 +310,8 @@ class MatchFragment : Fragment() {
             isTiebreak = true
             minScoreToWinGame = 7
         }
+
+        addPointToHistory() //update the score history
     }
 
     fun gameWonByA() {
@@ -219,6 +341,9 @@ class MatchFragment : Fragment() {
         Toast.makeText(requireActivity(), "${playerNameA.text} is the Winner \n $matchScore ", Toast.LENGTH_LONG).show()
         pointsA.visibility = View.INVISIBLE
         pointsB.visibility = View.INVISIBLE
+        ballA.visibility = View.INVISIBLE
+        ballB.visibility = View.INVISIBLE
+        imageUndo.visibility = View.INVISIBLE
     }
 
     @SuppressLint("SetTextI18n")
@@ -264,6 +389,8 @@ class MatchFragment : Fragment() {
             isTiebreak = true
             minScoreToWinGame = 7
         }
+
+        addPointToHistory() //update the score history
     }
 
     fun gameWonByB() {
@@ -293,6 +420,9 @@ class MatchFragment : Fragment() {
         Toast.makeText(requireActivity(), "${playerNameB.text} is the Winner \n $matchScore ", Toast.LENGTH_LONG).show()
         pointsA.visibility = View.INVISIBLE
         pointsB.visibility = View.INVISIBLE
+        ballA.visibility = View.INVISIBLE
+        ballB.visibility = View.INVISIBLE
+        imageUndo.visibility = View.INVISIBLE
     }
 
     fun nextSet() {
@@ -371,15 +501,28 @@ class MatchFragment : Fragment() {
 
         pointsA.visibility = View.VISIBLE
         pointsB.visibility = View.VISIBLE
+        ballA.visibility = View.VISIBLE
+        ballB.visibility = View.INVISIBLE
+        servingA = true
 
         matchScore = ""
+
+        pointNumber = 0
+        addPointToHistory() // initial point
+        imageUndo.visibility = View.VISIBLE
+    }
+
+    fun addPointToHistory(){
+        currentPoint = "$currentSet ${set1A.text} ${set1B.text} ${set2A.text} ${set2B.text} ${set3A.text} ${set3B.text} ${pointsA.text} ${pointsB.text} $servingA"
+        scoreHistory.add(pointNumber,currentPoint)
+        pointNumber++
     }
 
 
 
 
 /*    companion object {
-        *//**
+        *//*
          * Use this factory method to create a new instance of
          * this fragment using the provided parameters.
          *
