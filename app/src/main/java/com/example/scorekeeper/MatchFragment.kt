@@ -1,11 +1,10 @@
 package com.example.scorekeeper
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.graphics.Color
 import android.graphics.Typeface
-import android.media.Image
 import android.os.Bundle
+import android.speech.tts.TextToSpeech
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,6 +13,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import kotlinx.android.synthetic.main.fragment_match.*
+import java.util.*
 import kotlin.math.abs
 
 /*
@@ -27,7 +27,7 @@ private const val ARG_PARAM2 = "param2"*/
  * Use the [MatchFragment.newInstance] factory method to
  * create an instance of this fragment.
  */
-class MatchFragment : Fragment() {
+class MatchFragment : Fragment(), TextToSpeech.OnInitListener  {
 /*    // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
@@ -39,45 +39,56 @@ class MatchFragment : Fragment() {
             param2 = it.getString(ARG_PARAM2)
         }
     }*/
-    val scores = listOf("0", "15", "30", "40")
-    val scoreMap = mapOf("0" to 0, "15" to 1, "30" to 2, "40" to 3)
-    var matchScore = ""
+    private val scores = listOf("0", "15", "30", "40")
+    private val scoreMap = mapOf("0" to 0, "15" to 1, "30" to 2, "40" to 3)
+    private var scoreVoiceMap = mapOf<String, String>()
 
-    var gameScoreA = 0
-    var gameScoreB = 0
-    var setScoreA = 0
-    var setScoreB = 0
-    var setsWonA = 0
-    var setsWonB = 0
+    private var matchScore = ""
 
-    var isTiebreak = false
-    var currentSet = 1
-    var servingA = false
+    private var gameScoreA = 0
+    private var gameScoreB = 0
+    private var setScoreA = 0
+    private var setScoreB = 0
+    private var setsWonA = 0
+    private var setsWonB = 0
 
-    var minScoreToWinGame = 4
+    private var setOldA = 0
+    private var setOldB = 0
 
-    lateinit var currentTextSetA: TextView
-    lateinit var currentTextSetB: TextView
+    private var isTiebreak = false
+    private var currentSet = 1
+    private var servingA = false
 
-    lateinit var playerNameA: TextView
-    lateinit var playerNameB: TextView
+    private var minScoreToWinGame = 4
 
-    lateinit var pointsA: TextView
-    lateinit var pointsB: TextView
+    private lateinit var currentTextSetA: TextView
+    private lateinit var currentTextSetB: TextView
 
-    lateinit var set1A: TextView
-    lateinit var set2A: TextView
-    lateinit var set3A: TextView
-    lateinit var set1B: TextView
-    lateinit var set2B: TextView
-    lateinit var set3B: TextView
+    private lateinit var playerNameA: TextView
+    private lateinit var playerNameB: TextView
 
-    lateinit var ballA: ImageView
-    lateinit var ballB: ImageView
+    private lateinit var pointsA: TextView
+    private lateinit var pointsB: TextView
 
-    var currentPoint = ""
-    var pointNumber = 0
-    var scoreHistory = mutableListOf<String>()
+    private lateinit var set1A: TextView
+    private lateinit var set2A: TextView
+    private lateinit var set3A: TextView
+    private lateinit var set1B: TextView
+    private  lateinit var set2B: TextView
+    private lateinit var set3B: TextView
+
+    private lateinit var ballA: ImageView
+    private lateinit var ballB: ImageView
+    private lateinit var speech: ImageView
+
+    private var currentPoint = ""
+    private  var pointNumber = 0
+    private  var scoreHistory = mutableListOf<String>()
+
+    private var tts: TextToSpeech? = null
+
+    private var tiebreakPointNumber = 0
+    private var mute = false
 
     @SuppressLint("SetTextI18n")
     override fun onCreateView(
@@ -87,37 +98,50 @@ class MatchFragment : Fragment() {
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_match, container, false)
 
-        set1A = view.findViewById<TextView>(R.id.textSet1A)
-        set2A = view.findViewById<TextView>(R.id.textSet2A)
-        set3A = view.findViewById<TextView>(R.id.textSet3A)
+        set1A = view.findViewById(R.id.textSet1A)
+        set2A = view.findViewById(R.id.textSet2A)
+        set3A = view.findViewById(R.id.textSet3A)
 
-        set1B = view.findViewById<TextView>(R.id.textSet1B)
-        set2B = view.findViewById<TextView>(R.id.textSet2B)
-        set3B = view.findViewById<TextView>(R.id.textSet3B)
+        set1B = view.findViewById(R.id.textSet1B)
+        set2B = view.findViewById(R.id.textSet2B)
+        set3B = view.findViewById(R.id.textSet3B)
 
         set2A.visibility = View.INVISIBLE
         set2B.visibility = View.INVISIBLE
         set3A.visibility = View.INVISIBLE
         set3B.visibility = View.INVISIBLE
 
-        ballA = view.findViewById<ImageView>(R.id.ballA)
-        ballB = view.findViewById<ImageView>(R.id.ballB)
+        ballA = view.findViewById(R.id.ballA)
+        ballB = view.findViewById(R.id.ballB)
         ballB.visibility= View.INVISIBLE
+
+        speech = view.findViewById(R.id.imageVolume)
+        speech.visibility = View.INVISIBLE // enable visibility when voice engine is ready
+        tts = TextToSpeech(requireActivity(), this)
 
         currentTextSetA = set1A
         currentTextSetB = set1B
 
-        pointsA = view.findViewById<TextView>(R.id.textPointsA)
-        pointsB = view.findViewById<TextView>(R.id.textPointsB)
+        pointsA = view.findViewById(R.id.textPointsA)
+        pointsB = view.findViewById(R.id.textPointsB)
         pointsA.text = "0"
         pointsB.text = "0"
 
-        playerNameA = view.findViewById<TextView>(R.id.textPlayerA)
+        playerNameA = view.findViewById(R.id.textPlayerA)
         playerNameA.text = "Federer"
         servingA = true // Player A start serving; then it should be changed when a game ends
 
-        playerNameB = view.findViewById<TextView>(R.id.textPlayerB)
+        playerNameB = view.findViewById(R.id.textPlayerB)
         playerNameB.text = "Nadal"
+
+        scoreVoiceMap = mapOf(
+            "0-15" to "Love fifteen", "0-30" to "Love thirty",
+            "0-40" to "Love forty", "15-0" to "Fifteen love", "30-0" to "Thirty love",
+            "40-0" to "Forty love", "15-40" to "Fifteen forty", "15-15" to "Fifteen all",
+            "30-15" to "Thirty fifteen", "15-30" to "Fifteen thirty", "30-30" to "Thirty all",
+            "40-30" to "Forty thirty", "30-40" to "Thirty forty",
+            "40-15" to "Forty fifteen"
+        )
 
         // Reset match
         val iconRestart = view.findViewById<ImageView>(R.id.imageLoop)
@@ -134,7 +158,11 @@ class MatchFragment : Fragment() {
         // Undo last point
         val iconUndo = view.findViewById<ImageView>(R.id.imageUndo)
         iconUndo.setOnClickListener {
-            if (pointNumber == 1) Toast.makeText(requireActivity(), "First point of the match!\nLet's play!", Toast.LENGTH_SHORT).show()
+            if (pointNumber == 1) Toast.makeText(
+                requireActivity(),
+                "First point of the match!\nLet's play!",
+                Toast.LENGTH_SHORT
+            ).show()
             else getPreviousScore()
         }
 
@@ -146,12 +174,9 @@ class MatchFragment : Fragment() {
             pointWonByB()
         }
 
-        val volume = view.findViewById<ImageView>(R.id.imageVolume)
-        var mute = false
-
-        volume.setOnClickListener {
-            if (!mute) volume.setBackgroundResource(R.drawable.ic_baseline_volume_off_30)
-            else volume.setBackgroundResource(R.drawable.ic_baseline_volume_up_30)
+        speech.setOnClickListener {
+            if (!mute) speech.setBackgroundResource(R.drawable.ic_baseline_volume_off_30)
+            else speech.setBackgroundResource(R.drawable.ic_baseline_volume_up_30)
             mute = !mute
         }
 
@@ -161,13 +186,13 @@ class MatchFragment : Fragment() {
         return view
     }
 
-    fun getPreviousScore(){
-        val scoreValues = (scoreHistory[pointNumber-2].split(" "))
+    private fun getPreviousScore(){
+        val scoreValues = (scoreHistory[pointNumber - 2].split(" "))
         println(scoreValues)
 
         when(scoreValues[0]){ // number of set playing
             "1" -> { // 1st set
-                if(setsWonA == 1) {
+                if (setsWonA == 1) {
                     currentSet--
                     setsWonA = 0
                     set1A.setTextColor(Color.parseColor("#E9ECF5"))
@@ -175,8 +200,7 @@ class MatchFragment : Fragment() {
                     currentTextSetA = set1A
                     currentTextSetB = set1B
                     matchScore = ""
-                }
-                else if (setsWonB == 1){
+                } else if (setsWonB == 1) {
                     currentSet--
                     setsWonB = 0
                     set1B.setTextColor(Color.parseColor("#E9ECF5"))
@@ -193,24 +217,23 @@ class MatchFragment : Fragment() {
             "2" -> { // 2nd set
                 val previousSet2A = set2A.text.toString().toInt()
                 val previousSet2B = set2B.text.toString().toInt()
-                val matchScoreIsClose = abs(previousSet2A - previousSet2B ) < 2
-                if (previousSet2A == 7 || (!matchScoreIsClose && previousSet2A >= 6)){
+                val matchScoreIsClose = abs(previousSet2A - previousSet2B) < 2
+                if (previousSet2A == 7 || (!matchScoreIsClose && previousSet2A >= 6)) {
                     currentSet--
                     setsWonA--
                     set2A.setTextColor(Color.parseColor("#E9ECF5"))
                     set2A.typeface = Typeface.SANS_SERIF
                     currentTextSetA = set2A
                     currentTextSetB = set2B
-                    matchScore = matchScore.substring(0,3)
-                }
-                else if (previousSet2B == 7 || (!matchScoreIsClose && previousSet2B >= 6)){
+                    matchScore = matchScore.substring(0, 3)
+                } else if (previousSet2B == 7 || (!matchScoreIsClose && previousSet2B >= 6)) {
                     currentSet--
                     setsWonB--
                     set2B.setTextColor(Color.parseColor("#E9ECF5"))
                     set2B.typeface = Typeface.SANS_SERIF
                     currentTextSetA = set2A
                     currentTextSetB = set2B
-                    matchScore = matchScore.substring(0,3)
+                    matchScore = matchScore.substring(0, 3)
                 }
                 set3A.visibility = View.INVISIBLE
                 set3B.visibility = View.INVISIBLE
@@ -239,6 +262,7 @@ class MatchFragment : Fragment() {
             }
         }
         else { // tiebreak
+            tiebreakPointNumber--
             gameScoreA = scoreValues[7].toInt()
             gameScoreB = scoreValues[8].toInt()
         }
@@ -270,51 +294,114 @@ class MatchFragment : Fragment() {
     fun pointWonByA() {
         gameScoreA++
 
-        if (!isTiebreak){ // no tiebreak
-            if(gameScoreA <=3) pointsA.text = scores[gameScoreA]
+        if (!isTiebreak){ // NOT TIEBREAK
+            if(gameScoreA <=3 && !(gameScoreA == 3 && gameScoreB == 3)) pointsA.text = scores[gameScoreA]
             else { // gamescore > 3 -> deuce/adv scoring
                 when (gameScoreA - gameScoreB) {
                     0 -> {
                         pointsA.text = "40"
                         pointsB.text = "40"
+                        speakOut("Deuce")
                     }
-                    -1 -> pointsB.text = "AD"
-                    1 -> pointsA.text = "AD"
-                    else -> println("NADA")
+                    -1 -> {
+                        pointsB.text = "AD"
+                        speakOut("Advantage ${playerNameB.text}")
+                    }
+                    1 -> {
+                        pointsA.text = "AD"
+                        speakOut("Advantage ${playerNameA.text}")
+                    }
                 }
             }
         }
-        else { // tiebreak scoring
+        else { // TIEBREAK
+            if(tiebreakPointNumber % 2 == 1){ // change server after 2 points
+                servingA = !servingA
+                setIcon()
+            }
+            tiebreakPointNumber++
             pointsA.text = gameScoreA.toString()
+            when {
+                (gameScoreA > gameScoreB) -> speakOut("$gameScoreA $gameScoreB. ${playerNameA.text}")
+                (gameScoreA < gameScoreB) -> speakOut("$gameScoreB $gameScoreA. ${playerNameB.text}")
+                else -> speakOut("$gameScoreB all")
+            }
         }
 
         val diff = gameScoreA - gameScoreB
         if ( diff > 1 && gameScoreA >= minScoreToWinGame ) {
             gameWonByA()
             // check if the set has been won
-            val matchScoreIsClose = abs(setScoreA - setScoreB ) < 2
+            val matchScoreIsClose = abs(setScoreA - setScoreB) < 2
 
-            when {
-                (setScoreA == 7 || (!matchScoreIsClose && setScoreA >= 6))-> { // won the set
+            if (setScoreA == 7 || (!matchScoreIsClose && setScoreA >= 6)) { // won the set
                     setWonByA()
-                    if(setsWonA == 2){ // won the match
+                    if(setsWonA == 2){ // MATCH WON
                         matchWonByA()
+                        matchByVoice()
                     }
-                    else { // next set
+                    else { // NEXT SET
+                        // set to voice
+                        speakOut("Game and Set ${playerNameA.text}. $setOldA $setOldB")
                         nextSet()
                     }
-                }
+            }
+            else { // GAME WON; NOT THE SET
+                speakOut("Game ${playerNameA.text},")
+                tts?.playSilentUtterance(500, TextToSpeech.QUEUE_ADD, null)
+                gameScoreToVoice()
             }
         }
-        if ( setScoreA == 6 && setScoreB == 6 ) {
-            isTiebreak = true
-            minScoreToWinGame = 7
+        else{ // POINT WON; NOT THE GAME
+            if (servingA) scoreVoiceMap["${pointsA.text}-${pointsB.text}"]?.let { speakOut(it) }
+            else scoreVoiceMap["${pointsB.text}-${pointsA.text}"]?.let { speakOut(it) }
         }
+
 
         addPointToHistory() //update the score history
     }
 
-    fun gameWonByA() {
+    private fun gameScoreToVoice() { // Score in games to speech
+        if ( setScoreA == 6 && setScoreB == 6 ) {
+            isTiebreak = true
+            tiebreakPointNumber = 1
+            minScoreToWinGame = 7
+            speakOutAdd("Six games all. Tie break")
+        }
+        else{
+            when{
+                (setScoreA > setScoreB) -> {
+                    if (setScoreA > 1) speakOutAdd("${playerNameA.text} leads $setScoreA games to $setScoreB")
+                    else speakOutAdd("${playerNameA.text} leads $setScoreA game to $setScoreB")
+                }
+                (setScoreA < setScoreB) -> {
+                    if (setScoreB > 1) speakOutAdd("${playerNameB.text} leads $setScoreB games to $setScoreA")
+                    else speakOutAdd("${playerNameB.text} leads $setScoreB game to $setScoreA")
+                }
+                else -> {
+                    if (setScoreA > 1) speakOutAdd("$setScoreA games all")
+                    else speakOutAdd("$setScoreA game all")
+                }
+            }
+        }
+    }
+
+    private fun matchByVoice() {
+        if(setsWonA == 2){ // Player A won
+            when (currentSet){
+                2 -> speakOut("Game, set and match ${playerNameA.text}. ${set1A.text} ${set1B.text}, ${set2A.text} ${set2B.text}")
+                3 -> speakOut("Game, set and match ${playerNameA.text}. ${set1A.text} ${set1B.text}, ${set2A.text} ${set2B.text}, ${set3A.text} ${set3B.text}")
+            }
+        }
+        else { // Player B won
+            when (currentSet){
+                2 -> speakOut("Game, set and match ${playerNameB.text}. ${set1B.text} ${set1A.text}, ${set2B.text} ${set2A.text}")
+                3 -> speakOut("Game, set and match ${playerNameB.text}. ${set1B.text} ${set1A.text}, ${set2B.text} ${set2A.text}, ${set3B.text} ${set3A.text}")
+            }
+        }
+    }
+
+    private fun gameWonByA() {
         setScoreA++
         currentTextSetA.text = setScoreA.toString()
         gameScoreA = 0
@@ -326,19 +413,25 @@ class MatchFragment : Fragment() {
         setIcon()
     }
 
-    fun setWonByA() {
+    private fun setWonByA() {
         currentTextSetA.setTextColor(Color.parseColor("#99B2DD"))
         currentTextSetA.typeface = Typeface.DEFAULT_BOLD
         setsWonA++
         matchScore += "${setScoreA}-${setScoreB} "
         isTiebreak = false
+        setOldB = setScoreB
+        setOldA = setScoreA
         setScoreA = 0
         setScoreB = 0
         minScoreToWinGame = 4
     }
 
-    fun matchWonByA() {
-        Toast.makeText(requireActivity(), "${playerNameA.text} is the Winner \n $matchScore ", Toast.LENGTH_LONG).show()
+    private fun matchWonByA() {
+        Toast.makeText(
+            requireActivity(),
+            "${playerNameA.text} is the Winner \n $matchScore ",
+            Toast.LENGTH_LONG
+        ).show()
         pointsA.visibility = View.INVISIBLE
         pointsB.visibility = View.INVISIBLE
         ballA.visibility = View.INVISIBLE
@@ -350,50 +443,73 @@ class MatchFragment : Fragment() {
     fun pointWonByB() {
         gameScoreB++
 
-        if (!isTiebreak){ // no tiebreak
-            if(gameScoreB <=3) pointsB.text = scores[gameScoreB]
+        if (!isTiebreak){ // NOT TIEBREAK
+            if(gameScoreB <=3 && !(gameScoreA == 3 && gameScoreB == 3)) pointsB.text = scores[gameScoreB]
             else { // gamescore > 3 -> deuce/adv scoring
                 when (gameScoreA - gameScoreB) {
                     0 -> {
                         pointsA.text = "40"
                         pointsB.text = "40"
+                        speakOut("Deuce")
                     }
-                    -1 -> pointsB.text = "AD"
-                    1 -> pointsA.text = "AD"
-                    else -> println("NADA")
+                    -1 -> {
+                        pointsB.text = "AD"
+                        speakOut("Advantage ${playerNameB.text}")
+                    }
+                    1 -> {
+                        pointsA.text = "AD"
+                        speakOut("Advantage ${playerNameA.text}")
+                    }
                 }
             }
         }
-        else { // tiebreak
+        else { // TIEBREAK
             pointsB.text = gameScoreB.toString()
+            if(tiebreakPointNumber % 2 == 1){ // change server after 2 points
+                servingA = !servingA
+                setIcon()
+            }
+            tiebreakPointNumber++
+            when {
+                (gameScoreA > gameScoreB) -> speakOut("$gameScoreA $gameScoreB. ${playerNameA.text}")
+                (gameScoreA < gameScoreB) -> speakOut("$gameScoreB $gameScoreA. ${playerNameB.text}")
+                else -> speakOut("$gameScoreB all")
+            }
         }
 
         val diff = gameScoreB - gameScoreA
         if ( diff > 1 && gameScoreB >= minScoreToWinGame ) {
             gameWonByB()
             // check if the set has been won
-            val matchScoreIsClose = abs(setScoreA - setScoreB ) < 2
-            when {
-                (setScoreB == 7 || (!matchScoreIsClose && setScoreB >= 6))-> { // won the set
+            val matchScoreIsClose = abs(setScoreA - setScoreB) < 2
+            if(setScoreB == 7 || (!matchScoreIsClose && setScoreB >= 6)) {
+                // won the set
                     setWonByB()
-                    if(setsWonB == 2){ // won the match
+                    if(setsWonB == 2){ // MATCH WON
                         matchWonByB()
+                        matchByVoice()
                     }
-                    else { // next set
+                    else { // NEXT SET
+                        // set to voice
+                        speakOut("Game and Set ${playerNameB.text}. $setOldB $setOldA")
                         nextSet()
                     }
-                }
+
+            }
+            else { // GAME WON; NOT THE SET
+                speakOut("Game ${playerNameB.text}.")
+                tts?.playSilentUtterance(500, TextToSpeech.QUEUE_ADD, null)
+                gameScoreToVoice()
             }
         }
-        if ( setScoreA == 6 && setScoreB == 6 ) {
-            isTiebreak = true
-            minScoreToWinGame = 7
+        else{ // POINT WON; NOT THE SET
+            if (servingA) scoreVoiceMap["${pointsA.text}-${pointsB.text}"]?.let { speakOut(it) }
+            else scoreVoiceMap["${pointsB.text}-${pointsA.text}"]?.let { speakOut(it) }
         }
-
         addPointToHistory() //update the score history
     }
 
-    fun gameWonByB() {
+    private fun gameWonByB() {
         setScoreB++
         currentTextSetB.text = setScoreB.toString()
         gameScoreB = 0
@@ -405,19 +521,25 @@ class MatchFragment : Fragment() {
         setIcon()
     }
 
-    fun setWonByB() {
+    private fun setWonByB() {
         currentTextSetB.setTextColor(Color.parseColor("#E9AFA3"))
         currentTextSetB.typeface = Typeface.DEFAULT_BOLD
         setsWonB++
         matchScore += "${setScoreA}-${setScoreB} "
         isTiebreak = false
+        setOldB = setScoreB
+        setOldA = setScoreA
         setScoreA = 0
         setScoreB = 0
         minScoreToWinGame = 4
     }
 
-    fun matchWonByB() {
-        Toast.makeText(requireActivity(), "${playerNameB.text} is the Winner \n $matchScore ", Toast.LENGTH_LONG).show()
+    private fun matchWonByB() {
+        Toast.makeText(
+            requireActivity(),
+            "${playerNameB.text} is the Winner \n $matchScore ",
+            Toast.LENGTH_LONG
+        ).show()
         pointsA.visibility = View.INVISIBLE
         pointsB.visibility = View.INVISIBLE
         ballA.visibility = View.INVISIBLE
@@ -425,7 +547,7 @@ class MatchFragment : Fragment() {
         imageUndo.visibility = View.INVISIBLE
     }
 
-    fun nextSet() {
+    private fun nextSet() {
         currentSet++
         when (currentSet){
             2 -> {
@@ -443,7 +565,7 @@ class MatchFragment : Fragment() {
         }
     }
 
-    fun setIcon(){
+    private fun setIcon(){
         if (servingA) {
             ballA.visibility = View.VISIBLE
             ballB.visibility = View.INVISIBLE
@@ -454,7 +576,7 @@ class MatchFragment : Fragment() {
         }
     }
 
-    fun resetMatch() {
+    private fun resetMatch() {
         gameScoreA = 0
         gameScoreB = 0
         setScoreA = 0
@@ -510,16 +632,52 @@ class MatchFragment : Fragment() {
         pointNumber = 0
         addPointToHistory() // initial point
         imageUndo.visibility = View.VISIBLE
+
+        minScoreToWinGame = 4
     }
 
-    fun addPointToHistory(){
+    private fun addPointToHistory(){
         currentPoint = "$currentSet ${set1A.text} ${set1B.text} ${set2A.text} ${set2B.text} ${set3A.text} ${set3B.text} ${pointsA.text} ${pointsB.text} $servingA"
-        scoreHistory.add(pointNumber,currentPoint)
+        scoreHistory.add(pointNumber, currentPoint)
         pointNumber++
     }
 
+    override fun onInit(status: Int) {
+        if (status == TextToSpeech.SUCCESS) {
+            //val localeES = Locale("es", "ES")
+            val localeUS = Locale.US
+            //val result: Int
+            //result = tts?.setLanguage(localeES)!!
+            val result = tts?.setLanguage(localeUS) // set US English as language for tts
 
+            if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
+                Toast.makeText(activity, "This Language is not supported", Toast.LENGTH_SHORT).show()
+                //tts?.language = localeUS
+            } else {
+                // enable voice button
+                imageVolume.visibility = View.VISIBLE
+            }
+        } else {
+            Toast.makeText(activity, "Initialization Failed!", Toast.LENGTH_SHORT).show()
+        }
+    }
 
+    private fun speakOut(message: String) {
+        if(!mute) tts?.speak(message, TextToSpeech.QUEUE_FLUSH, null, null)
+    }
+
+    private fun speakOutAdd(message: String) {
+        if(!mute) tts?.speak(message, TextToSpeech.QUEUE_ADD, null, null)
+    }
+
+    override fun onDestroy() {
+        // Shutdown TTS
+        if (tts != null) {
+            tts!!.stop()
+            tts!!.shutdown()
+        }
+        super.onDestroy()
+    }
 
 /*    companion object {
         *//*
