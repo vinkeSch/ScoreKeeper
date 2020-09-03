@@ -7,5 +7,16 @@
     <string name="zero">0</string>
     <string name="player_b">PLAYER B</string>
     <string name="player_a">PLAYER A</string>
+    <string name="player_b2">PLAYER B:</string>
+    <string name="player_a2">PLAYER A:</string>
     <string name="ball">ball</string>
+    <string name="tennis">Tennis</string>
+    <string name="tennis_logo">Tennis Logo</string>
+    <string name="spikeball">Spikeball</string>
+    <string name="spikeball_logo">Spikeball Logo</string>
+    <string name="federer">Federer</string>
+    <string name="nadal">Nadal</string>
+    <string name="serve">Serve</string>
+    <string name="start">Start</string>
+    <string name="_21">21</string>
 </resources>

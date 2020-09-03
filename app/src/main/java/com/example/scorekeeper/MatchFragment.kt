@@ -1,10 +1,13 @@
 package com.example.scorekeeper
 
 import android.annotation.SuppressLint
+import android.content.pm.ActivityInfo
 import android.graphics.Color
 import android.graphics.Typeface
 import android.os.Bundle
 import android.speech.tts.TextToSpeech
+import android.util.Log
+import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,11 +19,13 @@ import kotlinx.android.synthetic.main.fragment_match.*
 import java.util.*
 import kotlin.math.abs
 
-/*
+
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
+/*
 private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"*/
+private const val ARG_PARAM2 = "param2"
+*/
 
 /*
  * A simple [Fragment] subclass.
@@ -39,6 +44,7 @@ class MatchFragment : Fragment(), TextToSpeech.OnInitListener  {
             param2 = it.getString(ARG_PARAM2)
         }
     }*/
+
     private val scores = listOf("0", "15", "30", "40")
     private val scoreMap = mapOf("0" to 0, "15" to 1, "30" to 2, "40" to 3)
     private var scoreVoiceMap = mapOf<String, String>()
@@ -90,6 +96,8 @@ class MatchFragment : Fragment(), TextToSpeech.OnInitListener  {
     private var tiebreakPointNumber = 0
     private var mute = false
 
+    private val TAG = "MatchFragment"
+
     @SuppressLint("SetTextI18n")
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -97,6 +105,25 @@ class MatchFragment : Fragment(), TextToSpeech.OnInitListener  {
     ): View? {
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_match, container, false)
+
+        view.isFocusableInTouchMode = true
+        view.requestFocus()
+        view.setOnKeyListener(View.OnKeyListener { _, keyCode, keyEvent ->
+            if (keyEvent.action == KeyEvent.ACTION_DOWN) {
+                if (keyCode == KeyEvent.KEYCODE_ENTER) {
+                    Log.d(TAG, "Enter button was pressed")
+                    pointWonByB()
+                    return@OnKeyListener true
+                } else if (keyCode == KeyEvent.KEYCODE_VOLUME_UP) {
+                    Log.d(TAG, "Volume up button was pressed")
+                    pointWonByA()
+                    return@OnKeyListener true
+                }
+            }
+            false
+        })
+
+        activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
 
         set1A = view.findViewById(R.id.textSet1A)
         set2A = view.findViewById(R.id.textSet2A)
@@ -127,12 +154,15 @@ class MatchFragment : Fragment(), TextToSpeech.OnInitListener  {
         pointsA.text = "0"
         pointsB.text = "0"
 
+        // Receive the data from caller fragment/activity
         playerNameA = view.findViewById(R.id.textPlayerA)
-        playerNameA.text = "Federer"
-        servingA = true // Player A start serving; then it should be changed when a game ends
+        playerNameA.text = arguments?.getString("nameA")
 
         playerNameB = view.findViewById(R.id.textPlayerB)
-        playerNameB.text = "Nadal"
+        playerNameB.text = arguments?.getString("nameB")
+
+        servingA = arguments?.getBoolean("serve")!!
+        setIcon()
 
         scoreVoiceMap = mapOf(
             "0-15" to "Love fifteen", "0-30" to "Love thirty",
@@ -187,9 +217,8 @@ class MatchFragment : Fragment(), TextToSpeech.OnInitListener  {
     }
 
     private fun getPreviousScore(){
-        val scoreValues = (scoreHistory[pointNumber - 2].split(" "))
-        println(scoreValues)
 
+        val scoreValues = (scoreHistory[pointNumber - 2].split(" "))
         when(scoreValues[0]){ // number of set playing
             "1" -> { // 1st set
                 if (setsWonA == 1) {
@@ -356,7 +385,6 @@ class MatchFragment : Fragment(), TextToSpeech.OnInitListener  {
             if (servingA) scoreVoiceMap["${pointsA.text}-${pointsB.text}"]?.let { speakOut(it) }
             else scoreVoiceMap["${pointsB.text}-${pointsA.text}"]?.let { speakOut(it) }
         }
-
 
         addPointToHistory() //update the score history
     }
@@ -676,18 +704,19 @@ class MatchFragment : Fragment(), TextToSpeech.OnInitListener  {
             tts!!.stop()
             tts!!.shutdown()
         }
+        activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
         super.onDestroy()
     }
 
 /*    companion object {
-        *//*
+        /**
          * Use this factory method to create a new instance of
          * this fragment using the provided parameters.
          *
          * @param param1 Parameter 1.
          * @param param2 Parameter 2.
-         * @return A new instance of fragment MatchFragment.
-         *//*
+         * @return A new instance of fragment MainMenuFragment.
+         */
         // TODO: Rename and change types and number of parameters
         @JvmStatic
         fun newInstance(param1: String, param2: String) =
