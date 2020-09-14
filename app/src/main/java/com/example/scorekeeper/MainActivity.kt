@@ -128,7 +128,6 @@ class MainActivity :  AppCompatActivity(), NavigationHost {
             // Otherwise, setup the connection session
         } else if (mBluetoothService == null) {
             //setupConn()
-            TODO()
         }
     }
 
