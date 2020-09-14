@@ -6,32 +6,37 @@ import android.widget.Toast
 import java.util.*
 
 class TTS(private val activity: Activity,
-          private val message: String,
           private val es: Boolean) : TextToSpeech.OnInitListener {
 
-    private val tts: TextToSpeech = TextToSpeech(activity, this)
+    val tts: TextToSpeech = TextToSpeech(activity, this)
 
-    override fun onInit(i: Int) {
-        if (i == TextToSpeech.SUCCESS) {
+    override fun onInit(status: Int) {
+        if (status == TextToSpeech.SUCCESS) {
 
-            val localeBR = Locale("pt", "BR")
+            // val localeBR = Locale("pt", "BR")
+            val localeES = Locale("es", "MX")
             val localeUS = Locale.US
 
             val result: Int
-            result = if (es) tts.setLanguage(localeBR) else tts.setLanguage(localeUS)
+            result = if (es) tts.setLanguage(localeES) else tts.setLanguage(localeUS)
 
             if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
                 Toast.makeText(activity, "This Language is not supported", Toast.LENGTH_SHORT).show()
             } else {
-                speakOut(message)
+                // enable voice button
+                // speakOut(message)
             }
 
         } else {
-            Toast.makeText(activity, "Initilization Failed!", Toast.LENGTH_SHORT).show()
+            Toast.makeText(activity, "Initialization Failed!", Toast.LENGTH_SHORT).show()
         }
     }
 
-    private fun speakOut(message: String) {
+    fun speakOut(message: String) {
         tts.speak(message, TextToSpeech.QUEUE_FLUSH, null, null)
+    }
+
+    fun speakOutAdd(message: String) {
+        tts.speak(message, TextToSpeech.QUEUE_ADD, null, null)
     }
 }

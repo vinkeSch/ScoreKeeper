@@ -2,11 +2,40 @@
 <resources>
     <color name="colorPrimary">#6200EE</color>
     <color name="colorPrimaryDark">#3A405A</color>
-    <color name="colorAccent">#03DAC5</color>
+    <color name="colorAccent">#D4E09B</color>
 
     <color name="colorA">#99B2DD</color>
     <color name="colorB">#E9AFA3</color>
+    <color name="colorC">#D4E09B</color>
     <color name="colorText">#E9ECF5</color>
     <color name="colorBackground">#3A405A</color>
+
+    <!-- Screens background color-->
+    <color name="bg_screen1">#3A405A</color>
+    <color name="bg_screen2">#3A405A</color>
+    <color name="bg_screen3">#3A405A</color>
+    <color name="bg_screen4">#3A405A</color>
+    <!-- dots inactive colors -->
+    <color name="dot_dark_screen1">#121a31</color>
+    <color name="dot_dark_screen2">#121a31</color>
+    <color name="dot_dark_screen3">#121a31</color>
+    <color name="dot_dark_screen4">#121a31</color>
+    <!-- dots active colors -->
+    <color name="dot_light_screen1">#99B2DD</color>
+    <color name="dot_light_screen2">#E9AFA3</color>
+    <color name="dot_light_screen3">#D4E09B</color>
+    <color name="dot_light_screen4">#656b87</color>
+    <array name="array_dot_active">
+        <item>@color/dot_light_screen1</item>
+        <item>@color/dot_light_screen2</item>
+        <item>@color/dot_light_screen3</item>
+        <item>@color/dot_light_screen4</item>
+    </array>
+    <array name="array_dot_inactive">
+        <item>@color/dot_dark_screen1</item>
+        <item>@color/dot_dark_screen2</item>
+        <item>@color/dot_dark_screen3</item>
+        <item>@color/dot_dark_screen4</item>
+    </array>
 
 </resources>

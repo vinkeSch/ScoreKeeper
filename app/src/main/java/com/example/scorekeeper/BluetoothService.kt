@@ -38,6 +38,16 @@ class BluetoothService(device: BluetoothDevice) {
     private var mmDevice = device
     private var mSecureAcceptThread: AcceptThread? = null
 
+    private val mState = 0
+    private val mNewState = 0
+
+    // Constants that indicate the current connection state
+    val STATE_NONE = 0 // we're doing nothing
+    val STATE_LISTEN = 1 // now listening for incoming connections
+    val STATE_CONNECTING = 2 // now initiating an outgoing connection
+    val STATE_CONNECTED = 3 // now connected to a remote device
+
+
     /**
      * Start the chat service. Specifically start AcceptThread to begin a
      * session in listening (server) mode. Called by the Activity onResume()

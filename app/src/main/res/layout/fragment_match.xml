@@ -97,6 +97,22 @@
                 android:text="@string/zero"
                 android:textColor="#E9ECF5"
                 android:textSize="30sp" />
+
+            <TextView
+                android:id="@+id/textSet4A"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/zero"
+                android:textColor="#E9ECF5"
+                android:textSize="30sp" />
+
+            <TextView
+                android:id="@+id/textSet5A"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/zero"
+                android:textColor="#E9ECF5"
+                android:textSize="30sp" />
         </LinearLayout>
 
         <View
@@ -136,6 +152,22 @@
 
             <TextView
                 android:id="@+id/textSet3B"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/zero"
+                android:textColor="#E9ECF5"
+                android:textSize="30sp" />
+
+            <TextView
+                android:id="@+id/textSet4B"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/zero"
+                android:textColor="#E9ECF5"
+                android:textSize="30sp" />
+
+            <TextView
+                android:id="@+id/textSet5B"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/zero"
@@ -210,14 +242,15 @@
                 app:srcCompat="@drawable/ic_baseline_replay_30"
                 tools:ignore="ContentDescription"/>
 
-            <ImageView
+            <ToggleButton
                 android:id="@+id/imageVolume"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
                 android:layout_marginLeft="50dp"
                 android:layout_marginRight="50dp"
-                app:srcCompat="@drawable/ic_baseline_volume_up_30"
-                tools:ignore="ContentDescription" />
+                android:textOff=""
+                android:textOn=""
+                android:background="@drawable/image_mute" />
 
             <ImageView
                 android:id="@+id/imageLoop"

@@ -2,55 +2,39 @@ package com.example.scorekeeper
 
 import android.content.res.ColorStateList
 import android.graphics.Color
-import android.media.Image
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import androidx.constraintlayout.widget.ConstraintLayout
 
-/*// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"*/
-
-/*
-*
- * A simple [Fragment] subclass.
- * Use the [MainMenuFragment.newInstance] factory method to
- * create an instance of this fragment.
-*/
 class MainMenuFragment : Fragment() {
-/*    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null*/
 
     private lateinit var radioA : RadioButton
     private lateinit var radioB : RadioButton
     var servingA = false
+
+    private lateinit var radioGroupSets : RadioGroup
+    private lateinit var radio1 : RadioButton
+    private lateinit var radio3 : RadioButton
+    private lateinit var radio5 : RadioButton
+    private var numberOfSets : Int = 0
 
     private lateinit var nameA : TextView
     private lateinit var nameB : TextView
     lateinit var logoTennis : ToggleButton
     lateinit var logoSpike : ToggleButton
 
-    lateinit var nameLayout : LinearLayout
-
-/*    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-    }*/
+    lateinit var nameLayout : ConstraintLayout
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        val view = inflater.inflate(R.layout.fragment_menu, container, false)
+        val view = inflater.inflate(R.layout.test, container, false)
 
         val fab: View = view.findViewById(R.id.fab)
         nameA = view.findViewById(R.id.nameA)
@@ -67,13 +51,14 @@ class MainMenuFragment : Fragment() {
                     else args.putString("nameA", nameA.text.toString())
                     if (nameB.text.isNullOrEmpty()) args.putString("nameB", "Player B")
                     else args.putString("nameB", nameB.text.toString())
+                    args.putInt("sets", numberOfSets)
 
                     val fragment: Fragment = if (logoTennis.isChecked) MatchFragment()
                     else SpikeFragment()
                     fragment.arguments = args
 
                     // Navigate to the next Fragment.
-                    (activity as NavigationHost).navigateTo(fragment, false)
+                    (activity as NavigationHost).navigateTo(fragment, true)
                 }
                 else {
                     Toast.makeText(requireActivity(), "Please select the first player to serve",
@@ -112,35 +97,43 @@ class MainMenuFragment : Fragment() {
         logoTennis.setOnClickListener {
             logoSpike.isChecked = !logoTennis.isChecked
             nameLayout.visibility = View.VISIBLE
+            radioGroupSets.visibility = View.VISIBLE
         }
         logoSpike.setOnClickListener {
             logoTennis.isChecked = !logoSpike.isChecked
             nameLayout.visibility = View.VISIBLE
+            radioGroupSets.visibility = View.VISIBLE
         }
 
-        nameLayout = view.findViewById(R.id.nameLayout)
+        nameLayout = view.findViewById(R.id.playersLayout)
         nameLayout.visibility = View.INVISIBLE
+
+        radioGroupSets = view.findViewById(R.id.radioGroupSets)
+        radioGroupSets.visibility = View.INVISIBLE
+
+        numberOfSets = 3 // By default 3 sets are played
+        radio1 = view.findViewById(R.id.radio1Set)
+        radio3 = view.findViewById(R.id.radio3Set)
+        radio5 = view.findViewById(R.id.radio5Set)
+
+        radio1.setOnClickListener {
+            if (radio1.isChecked) {
+                numberOfSets = 1
+            }
+        }
+
+        radio3.setOnClickListener {
+            if (radio3.isChecked) {
+                numberOfSets = 3
+            }
+        }
+
+        radio5.setOnClickListener {
+            if (radio5.isChecked) {
+                numberOfSets = 5
+            }
+        }
 
         return view
     }
-/*
-    companion object {
-        **
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment MainMenuFragment.
-
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            MainMenuFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
-            }
-    }*/
 }
