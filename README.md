@@ -12,5 +12,5 @@ Keep track of the score during the match! Let's play!
 * Score by voice after each point/game/set
 
 ## Screenshots
-![Screenshot](Screenshot_ScoreKeeper.jpg)
-![Screenshot](App_Storyboard.jpg)
+![Screenshot](Screenshots/Match_score.jpg)
+![Screenshot](Screenshots/App_Storyboard.jpg)
