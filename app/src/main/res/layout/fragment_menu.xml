@@ -10,13 +10,11 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="24dp"
-        android:paddingTop="16dp">
+        android:orientation="vertical">
 
         <LinearLayout
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:layout_gravity="center_horizontal" >
 
@@ -30,13 +28,13 @@
                     android:id="@+id/logoTennis"
                     android:layout_width="64dp"
                     android:layout_height="64dp"
-                    android:padding="10dp"
                     android:layout_gravity="center_horizontal"
                     android:layout_marginTop="48dp"
                     android:layout_marginBottom="16dp"
-                    android:background="@drawable/toggle_background"
+                    android:padding="10dp"
+                    android:background="@drawable/toggle_selector"
                     android:contentDescription="@string/tennis_logo"
-                    android:drawableTop="@drawable/ic_baseline_sports_tennis_24"
+                    android:drawableTop="@drawable/ic_round_sports_tennis_30"
                     android:textOff=""
                     android:textOn="" />
 
@@ -44,7 +42,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
-                    android:layout_marginBottom="132dp"
+                    android:layout_marginBottom="48dp"
                     android:fontFamily="sans-serif-medium"
                     android:text="@string/tennis"
                     android:textColor="@color/colorText"
@@ -54,8 +52,7 @@
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                >
+                android:orientation="vertical">
 
                 <ToggleButton
                     android:id="@+id/logoSpike"
@@ -65,7 +62,7 @@
                     android:layout_marginTop="48dp"
                     android:layout_marginBottom="16dp"
                     android:padding="10dp"
-                    android:background="@drawable/toggle_background"
+                    android:background="@drawable/toggle_selector"
                     android:textOff=""
                     android:textOn=""
                     android:drawableTop="@drawable/ic_baseline_sports_handball_40"
@@ -75,7 +72,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
-                    android:layout_marginBottom="132dp"
+                    android:layout_marginBottom="48dp"
                     android:fontFamily="sans-serif-medium"
                     android:text="@string/spikeball"
                     android:textColor="@color/colorText"
@@ -110,9 +107,10 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="12dp"
                 android:fontFamily="sans-serif-medium"
+                android:layout_gravity="center"
                 android:text="@string/player_a2"
                 android:textColor="@color/colorA"
-                android:textSize="18sp" />
+                android:textSize="20sp" />
 
             <EditText
                 android:id="@+id/nameA"
@@ -147,7 +145,8 @@
                 android:fontFamily="sans-serif-medium"
                 android:text="@string/player_b2"
                 android:textColor="@color/colorB"
-                android:textSize="18sp" />
+                android:layout_gravity="center"
+                android:textSize="20sp" />
 
             <EditText
                 android:id="@+id/nameB"
@@ -179,7 +178,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/serve"
                 android:textColor="@color/colorText"
-                android:textSize="14sp" />
+                android:textSize="16sp" />
 
             <RadioGroup
                 android:layout_width="fill_parent"
@@ -191,6 +190,7 @@
                     android:id="@+id/radioButtonA"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_gravity="center"
                     android:layout_marginTop="12dp"
                     android:buttonTint="@color/colorA" />
 
@@ -199,22 +199,66 @@
                     android:layout_marginTop="36dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_gravity="center"
                     android:buttonTint="@color/colorB" />
             </RadioGroup>
 
         </LinearLayout>
     </LinearLayout>
 
+        <RadioGroup
+            android:id="@+id/radioGroupSets"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="48dp"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginEnd="24dp"
+                android:fontFamily="sans-serif-medium"
+                android:text="@string/sets"
+                android:textColor="@color/colorText"
+                android:textSize="20sp" />
+
+            <RadioButton
+                android:id="@+id/radio1Set"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="24dp"
+                android:buttonTint="@color/colorText"
+                android:text="@string/_1"
+                android:textColor="@color/colorText" />
+
+            <RadioButton
+                android:id="@+id/radio3Set"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="24dp"
+                android:buttonTint="@color/colorText"
+                android:checked="true"
+                android:text="@string/_3"
+                android:textColor="@color/colorText" />
+
+            <RadioButton
+                android:id="@+id/radio5Set"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:buttonTint="@color/colorText"
+                android:text="@string/_5"
+                android:textColor="@color/colorText" />
+        </RadioGroup>
+
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/fab"
-            android:layout_width="wrap_content"
+            android:layout_width="44dp"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|end"
-            android:layout_marginTop="120dp"
+            android:layout_margin="10dp"
             android:contentDescription="@string/start"
-            app:backgroundTint="@color/colorText"
-            android:backgroundTint="@color/colorBackground"
-            app:srcCompat="@drawable/ic_baseline_sports_baseball_30" />
-
+            app:srcCompat="@drawable/ic_round_sports_baseball_50" />
     </LinearLayout>
 </ScrollView>

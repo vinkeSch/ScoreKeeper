@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bg_screen3"
+    android:gravity="center"
+    android:layout_gravity="center_vertical"
+    android:orientation="vertical">
+
+    <ImageView
+            android:layout_width="@dimen/img_width_height"
+            android:layout_height="@dimen/img_width_height"
+            android:src="@drawable/round_sports_baseball_white_48"
+            android:layout_marginBottom="12dp"
+            android:contentDescription="@string/tennis_ball" />
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/slide_3_title"
+            android:textColor="@color/colorC"
+            android:textSize="@dimen/slide_title"
+            android:textStyle="bold" />
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="36dp"
+            android:layout_marginBottom="36dp"
+            android:paddingLeft="@dimen/desc_padding"
+            android:paddingRight="@dimen/desc_padding"
+            android:text="@string/slide_3_desc"
+            android:textAlignment="center"
+            android:textColor="@android:color/white"
+            android:textSize="@dimen/slide_desc" />
+
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="64dp"
+            android:gravity="center_horizontal">
+
+        <ToggleButton
+                android:id="@+id/btn1"
+                android:layout_width="70dp"
+                android:layout_height="70dp"
+                android:layout_gravity="center_vertical"
+                android:background="@drawable/toggle_selector_intro"
+                android:textColor="@color/toggle_text"
+                android:textOn="@string/_1_set"
+                android:textOff="@string/_1_set"/>
+
+        <ToggleButton
+                android:id="@+id/btn3"
+                android:layout_width="70dp"
+                android:layout_height="70dp"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="24dp"
+                android:layout_marginEnd="24dp"
+                android:background="@drawable/toggle_selector_intro"
+                android:textColor="@color/toggle_text"
+                android:textOn="@string/_3_sets"
+                android:textOff="@string/_3_sets" />
+
+            <ToggleButton
+                android:id="@+id/btn5"
+                android:layout_width="70dp"
+                android:layout_height="70dp"
+                android:layout_gravity="center_vertical"
+                android:background="@drawable/toggle_selector_intro"
+                android:textColor="@color/toggle_text"
+                android:textOn="@string/_5_sets"
+                android:textOff="@string/_5_sets" />
+        </LinearLayout>
+</LinearLayout>

@@ -11,6 +11,7 @@ import android.view.*
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import android.widget.ToggleButton
 import androidx.fragment.app.Fragment
 import kotlinx.android.synthetic.main.fragment_match.*
 import java.lang.Math.abs
@@ -26,7 +27,7 @@ private const val ARG_PARAM2 = "param2"
  * Use the [SpikeFragment] factory method to
  * create an instance of this fragment.
  */
-class SpikeFragment : Fragment(), TextToSpeech.OnInitListener  {
+class SpikeFragment : Fragment()  {
     // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
@@ -65,15 +66,15 @@ class SpikeFragment : Fragment(), TextToSpeech.OnInitListener  {
 
     private lateinit var ballA: ImageView
     private lateinit var ballB: ImageView
-    private lateinit var speech: ImageView
+    private lateinit var speech: ToggleButton
 
     private var currentPoint = ""
     private  var pointNumber = 0
     private  var scoreHistory = mutableListOf<String>()
 
-    private var tts: TextToSpeech? = null
+    private lateinit var tts: TTS
 
-    private var mute = false
+    private var mute = true // No score by voice by default
 
     private val TAG = "SpikeFragment"
 
@@ -147,8 +148,7 @@ class SpikeFragment : Fragment(), TextToSpeech.OnInitListener  {
         ballB.visibility= View.INVISIBLE
 
         speech = view.findViewById(R.id.imageVolume)
-        speech.visibility = View.INVISIBLE // enable visibility when voice engine is ready
-        tts = TextToSpeech(requireActivity(), this)
+        tts = TTS(requireActivity(), true) // Spanish TTS
 
         currentTextSetA = set1A
         currentTextSetB = set1B
@@ -176,7 +176,6 @@ class SpikeFragment : Fragment(), TextToSpeech.OnInitListener  {
 
         iconRestart.setOnLongClickListener{
             resetMatch()
-            Toast.makeText(requireActivity(), "Match restarted", Toast.LENGTH_SHORT).show()
             true
         }
 
@@ -195,8 +194,6 @@ class SpikeFragment : Fragment(), TextToSpeech.OnInitListener  {
         }
 
         speech.setOnClickListener {
-            if (!mute) speech.setBackgroundResource(R.drawable.ic_baseline_volume_off_30)
-            else speech.setBackgroundResource(R.drawable.ic_baseline_volume_up_30)
             mute = !mute
         }
 
@@ -290,269 +287,245 @@ class SpikeFragment : Fragment(), TextToSpeech.OnInitListener  {
         ).show()
     }
 
-@SuppressLint("SetTextI18n")
-fun pointWonByA() {
-gameScoreA++
-servingA = true
-setIcon()
+    @SuppressLint("SetTextI18n")
+    fun pointWonByA() {
+        gameScoreA++
+        servingA = true
+        setIcon()
 
-val diff = gameScoreA - gameScoreB
-if ( diff > 1 && gameScoreA >= minScoreToWinSet ) { // SET WON
-    setWonByA()
-    // check if the match has been won
-    if(setsWonA == 2){ // MATCH WON
-        matchWonByA()
-        matchByVoice()
+        val diff = gameScoreA - gameScoreB
+        if ( diff > 1 && gameScoreA >= minScoreToWinSet ) { // SET WON
+            setWonByA()
+            // check if the match has been won
+            if(setsWonA == 2){ // MATCH WON
+                matchWonByA()
+                if (!mute) matchByVoice()
+            }
+            else { // NEXT SET
+                // set to voice
+                if (!mute) tts.speakOut("Set ${playerNameA.text}. $gameScoreA $gameScoreB")
+                nextSet()
+            }
+        }
+        else{ // POINT WON; NOT THE SET
+            pointsA.text = gameScoreA.toString()
+            if (!mute){
+                when {
+                    (gameScoreA > gameScoreB) -> tts.speakOut("$gameScoreA $gameScoreB, ${playerNameA.text}")
+                    (gameScoreA < gameScoreB) -> tts.speakOut("$gameScoreB $gameScoreA, ${playerNameB.text}")
+                    else -> tts.speakOut("$gameScoreA, iguales")
+                }
+            }
+        }
+        addPointToHistory() //update the score history
     }
-    else { // NEXT SET
-        // set to voice
-        speakOut("Set ${playerNameA.text}. $gameScoreA $gameScoreB")
-        nextSet()
+
+    private fun matchByVoice() {
+        if(setsWonA == 2){ // Player A won
+            when (currentSet){
+                2 -> tts.speakOut("Set y partido ${playerNameA.text}. ${set1A.text} ${set1B.text}, ${set2A.text} ${set2B.text}")
+                3 -> tts.speakOut("Set y partido ${playerNameA.text}. ${set1A.text} ${set1B.text}, ${set2A.text} ${set2B.text}, ${set3A.text} ${set3B.text}")
+            }
+        }
+        else { // Player B won
+            when (currentSet){
+                2 -> tts.speakOut("Set y partido ${playerNameB.text}. ${set1B.text} ${set1A.text}, ${set2B.text} ${set2A.text}")
+                3 -> tts.speakOut("Set y partido ${playerNameB.text}. ${set1B.text} ${set1A.text}, ${set2B.text} ${set2A.text}, ${set3B.text} ${set3A.text}")
+            }
+        }
     }
-}
-else{ // POINT WON; NOT THE SET
-    pointsA.text = gameScoreA.toString()
-    when {
-        (gameScoreA > gameScoreB) -> speakOut("$gameScoreA $gameScoreB, ${playerNameA.text}")
-        (gameScoreA < gameScoreB) -> speakOut("$gameScoreB $gameScoreA, ${playerNameB.text}")
-        else -> speakOut("$gameScoreA, iguales")
+
+    private fun setWonByA() {
+        currentTextSetA.setTextColor(Color.parseColor("#99B2DD"))
+        currentTextSetA.typeface = Typeface.DEFAULT_BOLD
+        currentTextSetA.text = gameScoreA.toString()
+        currentTextSetB.text = gameScoreB.toString()
+        setsWonA++
+        matchScore += "${gameScoreA}-${gameScoreB} "
     }
-}
-addPointToHistory() //update the score history
-}
 
-private fun matchByVoice() {
-if(setsWonA == 2){ // Player A won
-    when (currentSet){
-        2 -> speakOut("Set y partido ${playerNameA.text}. ${set1A.text} ${set1B.text}, ${set2A.text} ${set2B.text}")
-        3 -> speakOut("Set y partido ${playerNameA.text}. ${set1A.text} ${set1B.text}, ${set2A.text} ${set2B.text}, ${set3A.text} ${set3B.text}")
+    private fun matchWonByA() {
+        pointsA.visibility = View.INVISIBLE
+        pointsB.visibility = View.INVISIBLE
+        ballA.visibility = View.INVISIBLE
+        ballB.visibility = View.INVISIBLE
+        imageUndo.visibility = View.INVISIBLE
+
+        when (currentSet){
+            2 -> {
+                set2A.visibility = View.VISIBLE
+                set2B.visibility = View.VISIBLE
+            }
+            3 -> {
+                set3A.visibility = View.VISIBLE
+                set3B.visibility = View.VISIBLE
+            }
+        }
     }
-}
-else { // Player B won
-    when (currentSet){
-        2 -> speakOut("Set y partido ${playerNameB.text}. ${set1B.text} ${set1A.text}, ${set2B.text} ${set2A.text}")
-        3 -> speakOut("Set y partido ${playerNameB.text}. ${set1B.text} ${set1A.text}, ${set2B.text} ${set2A.text}, ${set3B.text} ${set3A.text}")
+
+    @SuppressLint("SetTextI18n")
+    fun pointWonByB() {
+        gameScoreB++
+        servingA = false
+        setIcon()
+
+        val diff = gameScoreB - gameScoreA
+        if ( diff > 1 && gameScoreB >= minScoreToWinSet ) { // SET WON
+            setWonByB()
+            // check if the match has been won
+            if(setsWonB == 2){ // MATCH WON
+                matchWonByB()
+                if (!mute) matchByVoice()
+            }
+            else { // NEXT SET
+                // set to voice
+                if (!mute) tts.speakOut("Set ${playerNameB.text}. $gameScoreB $gameScoreA")
+                nextSet()
+            }
+        }
+        else{ // POINT WON; NOT THE SET
+            pointsB.text = gameScoreB.toString()
+            if (!mute) {
+                when {
+                    (gameScoreA > gameScoreB) -> tts.speakOut("$gameScoreA $gameScoreB, ${playerNameA.text}")
+                    (gameScoreA < gameScoreB) -> tts.speakOut("$gameScoreB $gameScoreA, ${playerNameB.text}")
+                    else -> tts.speakOut("$gameScoreA, iguales")
+                }
+            }
+        }
+        addPointToHistory() //update the score history
     }
-}
-}
 
-private fun setWonByA() {
-currentTextSetA.setTextColor(Color.parseColor("#99B2DD"))
-currentTextSetA.typeface = Typeface.DEFAULT_BOLD
-currentTextSetA.text = gameScoreA.toString()
-currentTextSetB.text = gameScoreB.toString()
-setsWonA++
-matchScore += "${gameScoreA}-${gameScoreB} "
-}
-
-private fun matchWonByA() {
-pointsA.visibility = View.INVISIBLE
-pointsB.visibility = View.INVISIBLE
-ballA.visibility = View.INVISIBLE
-ballB.visibility = View.INVISIBLE
-imageUndo.visibility = View.INVISIBLE
-
-when (currentSet){
-    2 -> {
-        set2A.visibility = View.VISIBLE
-        set2B.visibility = View.VISIBLE
+    private fun setWonByB() {
+        currentTextSetB.setTextColor(Color.parseColor("#E9AFA3"))
+        currentTextSetB.typeface = Typeface.DEFAULT_BOLD
+        currentTextSetA.text = gameScoreA.toString()
+        currentTextSetB.text = gameScoreB.toString()
+        setsWonB++
+        matchScore += "${gameScoreA}-${gameScoreB} "
     }
-    3 -> {
-        set3A.visibility = View.VISIBLE
-        set3B.visibility = View.VISIBLE
+
+    private fun matchWonByB() {
+        pointsA.visibility = View.INVISIBLE
+        pointsB.visibility = View.INVISIBLE
+        ballA.visibility = View.INVISIBLE
+        ballB.visibility = View.INVISIBLE
+        imageUndo.visibility = View.INVISIBLE
+
+        when (currentSet){
+            2 -> {
+                set2A.visibility = View.VISIBLE
+                set2B.visibility = View.VISIBLE
+            }
+            3 -> {
+                set3A.visibility = View.VISIBLE
+                set3B.visibility = View.VISIBLE
+            }
+        }
     }
-}
-}
 
-@SuppressLint("SetTextI18n")
-fun pointWonByB() {
-gameScoreB++
-servingA = false
-setIcon()
-
-val diff = gameScoreB - gameScoreA
-if ( diff > 1 && gameScoreB >= minScoreToWinSet ) { // SET WON
-    setWonByB()
-    // check if the match has been won
-    if(setsWonB == 2){ // MATCH WON
-        matchWonByB()
-        matchByVoice()
+    private fun nextSet() {
+        currentSet++
+        when (currentSet){
+            2 -> {
+                currentTextSetA = set2A
+                set1A.visibility = View.VISIBLE
+                currentTextSetB = set2B
+                set1B.visibility = View.VISIBLE
+            }
+            3 -> {
+                currentTextSetA = set3A
+                set2A.visibility = View.VISIBLE
+                currentTextSetB = set3B
+                set2B.visibility = View.VISIBLE
+            }
+        }
+        // reset gameScores
+        gameScoreA = 0
+        pointsA.text = "0"
+        gameScoreB = 0
+        pointsB.text = "0"
     }
-    else { // NEXT SET
-        // set to voice
-        speakOut("Set ${playerNameB.text}. $gameScoreB $gameScoreA")
-        nextSet()
+
+    private fun setIcon(){
+        if (servingA) {
+            ballA.visibility = View.VISIBLE
+            ballB.visibility = View.INVISIBLE
+        }
+        else {
+            ballB.visibility = View.VISIBLE
+            ballA.visibility = View.INVISIBLE
+        }
     }
-}
-else{ // POINT WON; NOT THE SET
-    pointsB.text = gameScoreB.toString()
-    when {
-        (gameScoreA > gameScoreB) -> speakOut("$gameScoreA $gameScoreB, ${playerNameA.text}")
-        (gameScoreA < gameScoreB) -> speakOut("$gameScoreB $gameScoreA, ${playerNameB.text}")
-        else -> speakOut("$gameScoreA, iguales")
+
+    private fun resetMatch() {
+        gameScoreA = 0
+        gameScoreB = 0
+
+        pointsA.text = "0"
+        pointsB.text = "0"
+
+        setsWonA = 0
+        setsWonB = 0
+
+        set1A.text = "0"
+        set1A.setTextColor(Color.parseColor("#E9ECF5"))
+        set1A.typeface = Typeface.SANS_SERIF
+
+        set2A.text = "0"
+        set2A.setTextColor(Color.parseColor("#E9ECF5"))
+        set2A.typeface = Typeface.SANS_SERIF
+        set2A.visibility = View.INVISIBLE
+
+        set3A.text = "0"
+        set3A.setTextColor(Color.parseColor("#E9ECF5"))
+        set3A.typeface = Typeface.SANS_SERIF
+        set3A.visibility = View.INVISIBLE
+
+        set1B.text = "0"
+        set1B.setTextColor(Color.parseColor("#E9ECF5"))
+        set1B.typeface = Typeface.SANS_SERIF
+
+        set2B.text = "0"
+        set2B.setTextColor(Color.parseColor("#E9ECF5"))
+        set2B.typeface = Typeface.SANS_SERIF
+        set2B.visibility = View.INVISIBLE
+
+        set3B.text = "0"
+        set3B.setTextColor(Color.parseColor("#E9ECF5"))
+        set3B.typeface = Typeface.SANS_SERIF
+        set3B.visibility = View.INVISIBLE
+
+        currentSet = 1
+        currentTextSetA = set1A
+        currentTextSetB = set1B
+
+        pointsA.visibility = View.VISIBLE
+        pointsB.visibility = View.VISIBLE
+        ballA.visibility = View.VISIBLE
+        ballB.visibility = View.INVISIBLE
+        servingA = true
+
+        matchScore = ""
+
+        pointNumber = 0
+        addPointToHistory() // initial point
+        imageUndo.visibility = View.VISIBLE
+
+        Toast.makeText(requireActivity(), "Match restarted", Toast.LENGTH_SHORT).show()
     }
-}
-addPointToHistory() //update the score history
-}
 
-private fun setWonByB() {
-currentTextSetB.setTextColor(Color.parseColor("#E9AFA3"))
-currentTextSetB.typeface = Typeface.DEFAULT_BOLD
-currentTextSetA.text = gameScoreA.toString()
-currentTextSetB.text = gameScoreB.toString()
-setsWonB++
-matchScore += "${gameScoreA}-${gameScoreB} "
-}
-
-private fun matchWonByB() {
-pointsA.visibility = View.INVISIBLE
-pointsB.visibility = View.INVISIBLE
-ballA.visibility = View.INVISIBLE
-ballB.visibility = View.INVISIBLE
-imageUndo.visibility = View.INVISIBLE
-
-when (currentSet){
-    2 -> {
-        set2A.visibility = View.VISIBLE
-        set2B.visibility = View.VISIBLE
+    private fun addPointToHistory(){
+        currentPoint = "$currentSet ${set1A.text} ${set1B.text} ${set2A.text} ${set2B.text} ${set3A.text} ${set3B.text} ${pointsA.text} ${pointsB.text} $servingA"
+        scoreHistory.add(pointNumber, currentPoint)
+        pointNumber++
     }
-    3 -> {
-        set3A.visibility = View.VISIBLE
-        set3B.visibility = View.VISIBLE
+
+    override fun onDestroy() {
+        // Shutdown TTS
+        tts.tts.stop()
+        tts.tts.shutdown()
+        activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+        super.onDestroy()
+        }
     }
-}
-}
-
-private fun nextSet() {
-currentSet++
-when (currentSet){
-    2 -> {
-        currentTextSetA = set2A
-        set1A.visibility = View.VISIBLE
-        currentTextSetB = set2B
-        set1B.visibility = View.VISIBLE
-    }
-    3 -> {
-        currentTextSetA = set3A
-        set2A.visibility = View.VISIBLE
-        currentTextSetB = set3B
-        set2B.visibility = View.VISIBLE
-    }
-}
-// reset gameScores
-gameScoreA = 0
-pointsA.text = "0"
-gameScoreB = 0
-pointsB.text = "0"
-}
-
-private fun setIcon(){
-if (servingA) {
-    ballA.visibility = View.VISIBLE
-    ballB.visibility = View.INVISIBLE
-}
-else {
-    ballB.visibility = View.VISIBLE
-    ballA.visibility = View.INVISIBLE
-}
-}
-
-private fun resetMatch() {
-gameScoreA = 0
-gameScoreB = 0
-
-pointsA.text = "0"
-pointsB.text = "0"
-
-setsWonA = 0
-setsWonB = 0
-
-set1A.text = "0"
-set1A.setTextColor(Color.parseColor("#E9ECF5"))
-set1A.typeface = Typeface.SANS_SERIF
-
-set2A.text = "0"
-set2A.setTextColor(Color.parseColor("#E9ECF5"))
-set2A.typeface = Typeface.SANS_SERIF
-set2A.visibility = View.INVISIBLE
-
-set3A.text = "0"
-set3A.setTextColor(Color.parseColor("#E9ECF5"))
-set3A.typeface = Typeface.SANS_SERIF
-set3A.visibility = View.INVISIBLE
-
-set1B.text = "0"
-set1B.setTextColor(Color.parseColor("#E9ECF5"))
-set1B.typeface = Typeface.SANS_SERIF
-
-set2B.text = "0"
-set2B.setTextColor(Color.parseColor("#E9ECF5"))
-set2B.typeface = Typeface.SANS_SERIF
-set2B.visibility = View.INVISIBLE
-
-set3B.text = "0"
-set3B.setTextColor(Color.parseColor("#E9ECF5"))
-set3B.typeface = Typeface.SANS_SERIF
-set3B.visibility = View.INVISIBLE
-
-currentSet = 1
-currentTextSetA = set1A
-currentTextSetB = set1B
-
-pointsA.visibility = View.VISIBLE
-pointsB.visibility = View.VISIBLE
-ballA.visibility = View.VISIBLE
-ballB.visibility = View.INVISIBLE
-servingA = true
-
-matchScore = ""
-
-pointNumber = 0
-addPointToHistory() // initial point
-imageUndo.visibility = View.VISIBLE
-}
-
-private fun addPointToHistory(){
-currentPoint = "$currentSet ${set1A.text} ${set1B.text} ${set2A.text} ${set2B.text} ${set3A.text} ${set3B.text} ${pointsA.text} ${pointsB.text} $servingA"
-scoreHistory.add(pointNumber, currentPoint)
-pointNumber++
-}
-
-override fun onInit(status: Int) {
-if (status == TextToSpeech.SUCCESS) {
-    val localeES = Locale("es", "MX")
-    //val localeUS = Locale.US
-    val result: Int
-    result = tts?.setLanguage(localeES)!!
-    //val result = tts?.setLanguage(localeUS) // set US English as language for tts
-
-    if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
-        Toast.makeText(activity, "This Language is not supported", Toast.LENGTH_SHORT).show()
-        //tts?.language = localeUS
-    } else {
-        // enable voice button
-        imageVolume.visibility = View.VISIBLE
-    }
-} else {
-    Toast.makeText(activity, "Initialization Failed!", Toast.LENGTH_SHORT).show()
-}
-}
-
-private fun speakOut(message: String) {
-if(!mute) tts?.speak(message, TextToSpeech.QUEUE_FLUSH, null, null)
-}
-
-private fun speakOutAdd(message: String) {
-if(!mute) tts?.speak(message, TextToSpeech.QUEUE_ADD, null, null)
-}
-
-override fun onDestroy() {
-// Shutdown TTS
-if (tts != null) {
-    tts!!.stop()
-    tts!!.shutdown()
-}
-activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-super.onDestroy()
-}
-}

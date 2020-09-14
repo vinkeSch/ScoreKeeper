@@ -7,8 +7,8 @@
     <string name="zero">0</string>
     <string name="player_b">PLAYER B</string>
     <string name="player_a">PLAYER A</string>
-    <string name="player_b2">PLAYER B:</string>
-    <string name="player_a2">PLAYER A:</string>
+    <string name="player_b2">Player B:</string>
+    <string name="player_a2">Player A:</string>
     <string name="ball">ball</string>
     <string name="tennis">Tennis</string>
     <string name="tennis_logo">Tennis Logo</string>
@@ -19,4 +19,29 @@
     <string name="serve">Serve</string>
     <string name="start">Start</string>
     <string name="_21">21</string>
+    <string name="sets">Sets</string>
+    <string name="_1">1</string>
+    <string name="_3">3</string>
+    <string name="_5">5</string>
+
+    <string name="next">NEXT</string>
+    <string name="skip">SKIP</string>
+    <string name="start2">GOT IT</string>
+    <string name="slide_1_title">Hello Food!</string>
+    <string name="slide_1_desc">Please enter your name</string>
+    <string name="slide_2_title">Movie Tickets</string>
+    <string name="slide_2_desc">Book movie tickets for your family and friends!</string>
+    <string name="slide_3_title">SETS</string>
+    <string name="slide_3_desc">Please select the number of sets</string>
+    <string name="slide_4_title">SERVE</string>
+    <string name="slide_4_desc">Select the first player to serve</string>
+    <string name="play_again_desc">To see the welcome slider again, goto Settings -> apps -> welcome slider -> clear data</string>
+    <string name="play_again">Play Again</string>
+    <string name="btn_next">btn_next</string>
+    <string name="_1_set">1 SET</string>
+    <string name="_3_sets">3 SETS</string>
+    <string name="_5_sets">5 SETS</string>
+    <string name="face_player">face_player</string>
+    <string name="tennis_ball">tennis_ball</string>
+    <string name="tennis_racket">tennis_racket</string>
 </resources>
