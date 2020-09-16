@@ -9,7 +9,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -17,7 +16,7 @@ import androidx.core.text.HtmlCompat
 import androidx.fragment.app.Fragment
 import androidx.viewpager.widget.PagerAdapter
 import androidx.viewpager.widget.ViewPager.OnPageChangeListener
-import kotlinx.android.synthetic.main.activity_main.*
+import com.example.scorekeeper.databinding.ActivityMainBinding
 import kotlinx.android.synthetic.main.welcome_slide1.*
 import kotlinx.android.synthetic.main.welcome_slide2.*
 import kotlinx.android.synthetic.main.welcome_slide3.*
@@ -46,51 +45,47 @@ class MainActivity :  AppCompatActivity(), NavigationHost {
     private var mBluetoothService: BluetoothService? = null
 
     private var myViewPagerAdapter: MyViewPagerAdapter? = null
-    private lateinit var dotsLayout: LinearLayout
     private var numberOfSets : Int = 0
+
+    private lateinit var binding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        //setContentView(R.layout.activity_main)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        val view = binding.root
+        setContentView(view)
 
-        //viewPager = findViewById(R.id.view_pager)
-        //dotsLayout = findViewById(R.id.layoutDots)
-        //btnSkip = findViewById(R.id.btn_skip)
-       // btnNext = findViewById(R.id.btn_next)
-        // layouts of all welcome sliders
-        // add few more layouts if you want
-        // layouts of all welcome sliders
-        // add few more layouts if you want
         layouts = intArrayOf(
             R.layout.welcome_slide1,
             R.layout.welcome_slide2,
             R.layout.welcome_slide3,
             R.layout.welcome_slide4
         )
-        dotsLayout = findViewById(R.id.layoutDots)
+
         addBottomDots(0) // adding bottom dots
 
         myViewPagerAdapter = MyViewPagerAdapter()
-        view_pager.offscreenPageLimit = 3 // "off screen" pages to keep loaded each side of the current page
-        view_pager.adapter = myViewPagerAdapter
-        view_pager.addOnPageChangeListener(viewPagerPageChangeListener)
+        binding.viewPager.offscreenPageLimit = 3 // "off screen" pages to keep loaded each side of the current page
+        binding.viewPager.adapter = myViewPagerAdapter
+        binding.viewPager.addOnPageChangeListener(viewPagerPageChangeListener)
 
-        btn_skip.setOnClickListener {
+        binding.btnSkip.setOnClickListener {
             launchMatchScreen(savedInstanceState)
         }
 
-        btn_next.setOnClickListener {
+        binding.btnNext.setOnClickListener {
             // checking for last page
             // if last page match screen will be launched
             val current: Int = getItem(+1)
             if (current < layouts.size) {
                 // move to next screen
-                view_pager.currentItem = current
+                binding.viewPager.currentItem = current
             } else {
                 if(!btn1.isChecked && !btn3.isChecked && !btn5.isChecked) { // no sets selected
                     Toast.makeText(this, "Shall we play 1, 3 or 5 sets?",
                         Toast.LENGTH_LONG).show()
-                    view_pager.currentItem = 2 // sets selection page
+                    binding.viewPager.currentItem = 2 // sets selection page
                 }
                 else launchMatchScreen(savedInstanceState)
             }
@@ -103,13 +98,13 @@ class MainActivity :  AppCompatActivity(), NavigationHost {
         val dots = arrayOfNulls<TextView>(layouts.size)
         val colorsActive = resources.getIntArray(R.array.array_dot_active)
         val colorsInactive = resources.getIntArray(R.array.array_dot_inactive)
-        dotsLayout.removeAllViews()
+        binding.layoutDots.removeAllViews()
         for (i in dots.indices) {
             dots[i] = TextView(this)
             dots[i]!!.text = HtmlCompat.fromHtml("&#8226;", HtmlCompat.FROM_HTML_MODE_LEGACY)
             dots[i]!!.textSize = 35F
             dots[i]!!.setTextColor(colorsInactive[currentPage])
-            dotsLayout.addView(dots[i])
+            binding.layoutDots.addView(dots[i])
         }
         if (dots.isNotEmpty()) dots[currentPage]!!.setTextColor(colorsActive[currentPage])
     }
@@ -126,7 +121,7 @@ class MainActivity :  AppCompatActivity(), NavigationHost {
             startActivityForResult(enableIntent, REQUEST_ENABLE_BT)
             // Otherwise, setup the connection session
         } else if (mBluetoothService == null) {
-            //setupConn()
+            setupConn()
         }
     }
 
@@ -220,7 +215,7 @@ class MainActivity :  AppCompatActivity(), NavigationHost {
     }
 
     private fun getItem(i: Int): Int {
-        return view_pager.currentItem + i
+        return binding.viewPager.currentItem + i
     }
 
     private fun getNumberOfSets() : Int {
@@ -259,9 +254,9 @@ class MainActivity :  AppCompatActivity(), NavigationHost {
             addBottomDots(position)
             when(position){
                 2 -> { // Number of sets selection
-                    btn_next.visibility = View.VISIBLE
-                    btn_next.setImageResource(R.drawable.ic_round_keyboard_arrow_right_24)
-                    btn_next.setBackgroundResource(R.drawable.rounded_corners_btn_next)
+                    binding.btnNext.visibility = View.VISIBLE
+                    binding.btnNext.setImageResource(R.drawable.ic_round_keyboard_arrow_right_24)
+                    binding.btnNext.setBackgroundResource(R.drawable.rounded_corners_btn_next)
                     btn1.setOnCheckedChangeListener { _, isChecked ->
                         if (isChecked) { // The toggle is enabled, disable the others
                             btn3.isChecked = false
@@ -282,14 +277,14 @@ class MainActivity :  AppCompatActivity(), NavigationHost {
                     }
                 }
                 3 -> { // 1st player to serve
-                    if(!btnA.isChecked && !btnB.isChecked) btn_next.visibility = View.GONE
+                    if(!btnA.isChecked && !btnB.isChecked) binding.btnNext.visibility = View.GONE
                     if(btnA.isChecked) {
-                        btn_next.setImageResource(R.drawable.round_sports_baseball_white_24)
-                        btn_next.setBackgroundResource(R.drawable.rounded_corners_btn_next_a)
+                        binding.btnNext.setImageResource(R.drawable.round_sports_baseball_white_24)
+                        binding.btnNext.setBackgroundResource(R.drawable.rounded_corners_btn_next_a)
                     }
                     if(btnB.isChecked) {
-                        btn_next.setImageResource(R.drawable.round_sports_baseball_white_24)
-                        btn_next.setBackgroundResource(R.drawable.rounded_corners_btn_next_b)
+                        binding.btnNext.setImageResource(R.drawable.round_sports_baseball_white_24)
+                        binding.btnNext.setBackgroundResource(R.drawable.rounded_corners_btn_next_b)
                     }
                     // get names from previous pages
                     if (!nameA.text.isNullOrEmpty()) {
@@ -306,27 +301,27 @@ class MainActivity :  AppCompatActivity(), NavigationHost {
                     btnA.setOnCheckedChangeListener { _, isChecked ->
                         if (isChecked) { // Player A first to serve
                             btnB.isChecked = false
-                            btn_next.visibility = View.VISIBLE
-                            btn_next.setImageResource(R.drawable.round_sports_baseball_white_24)
-                            btn_next.setBackgroundResource(R.drawable.rounded_corners_btn_next_a)
+                            binding.btnNext.visibility = View.VISIBLE
+                            binding.btnNext.setImageResource(R.drawable.round_sports_baseball_white_24)
+                            binding.btnNext.setBackgroundResource(R.drawable.rounded_corners_btn_next_a)
                         }
                         else {
-                            btn_next.visibility = View.GONE
-                            btn_next.setImageResource(R.drawable.ic_round_keyboard_arrow_right_24)
-                            btn_next.setBackgroundResource(R.drawable.rounded_corners_btn_next)
+                            binding.btnNext.visibility = View.GONE
+                            binding.btnNext.setImageResource(R.drawable.ic_round_keyboard_arrow_right_24)
+                            binding.btnNext.setBackgroundResource(R.drawable.rounded_corners_btn_next)
                         }
                     }
                     btnB.setOnCheckedChangeListener { _, isChecked ->
                         if (isChecked) { // Player B first to serve
                             btnA.isChecked = false
-                            btn_next.visibility = View.VISIBLE
-                            btn_next.setImageResource(R.drawable.round_sports_baseball_white_24)
-                            btn_next.setBackgroundResource(R.drawable.rounded_corners_btn_next_b)
+                            binding.btnNext.visibility = View.VISIBLE
+                            binding.btnNext.setImageResource(R.drawable.round_sports_baseball_white_24)
+                            binding.btnNext.setBackgroundResource(R.drawable.rounded_corners_btn_next_b)
                         }
                         else {
-                            btn_next.visibility = View.GONE
-                            btn_next.setImageResource(R.drawable.ic_round_keyboard_arrow_right_24)
-                            btn_next.setBackgroundResource(R.drawable.rounded_corners_btn_next)
+                            binding.btnNext.visibility = View.GONE
+                            binding.btnNext.setImageResource(R.drawable.ic_round_keyboard_arrow_right_24)
+                            binding.btnNext.setBackgroundResource(R.drawable.rounded_corners_btn_next)
                         }
                     }
                 }
