@@ -34,7 +34,7 @@ class MainMenuFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        val view = inflater.inflate(R.layout.test, container, false)
+        val view = inflater.inflate(R.layout.fragment_menu, container, false)
 
         val fab: View = view.findViewById(R.id.fab)
         nameA = view.findViewById(R.id.nameA)
@@ -105,7 +105,7 @@ class MainMenuFragment : Fragment() {
             radioGroupSets.visibility = View.VISIBLE
         }
 
-        nameLayout = view.findViewById(R.id.playersLayout)
+        nameLayout = view.findViewById(R.id.nameLayout)
         nameLayout.visibility = View.INVISIBLE
 
         radioGroupSets = view.findViewById(R.id.radioGroupSets)
