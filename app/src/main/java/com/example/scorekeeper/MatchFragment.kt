@@ -10,6 +10,7 @@ import android.util.Log
 import android.view.*
 import android.widget.*
 import androidx.fragment.app.Fragment
+import com.example.scorekeeper.databinding.FragmentMatchBinding
 import kotlinx.android.synthetic.main.fragment_match.*
 import kotlin.math.abs
 
@@ -61,7 +62,6 @@ class MatchFragment : Fragment() {
 
     private lateinit var ballA: ImageView
     private lateinit var ballB: ImageView
-    private lateinit var speech: ToggleButton
 
     private var currentPoint = ""
     private var pointNumber = 0
@@ -74,13 +74,20 @@ class MatchFragment : Fragment() {
 
     private val TAG = "MatchFragment"
 
+    private var _binding: FragmentMatchBinding? = null
+    // This property is only valid between onCreateView and onDestroyView.
+    private val binding get() = _binding!!
+
     @SuppressLint("SetTextI18n")
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        val view = inflater.inflate(R.layout.fragment_match, container, false)
+        //val view = inflater.inflate(R.layout.fragment_match, container, false)
+
+        _binding = FragmentMatchBinding.inflate(inflater, container, false)
+        val view = binding.root
 
         // Different trigger events that can be sent when a user interacts with a button.
         view.isFocusableInTouchMode = true
@@ -128,17 +135,18 @@ class MatchFragment : Fragment() {
 
         activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
 
-        set1A = view.findViewById(R.id.textSet1A)
-        set2A = view.findViewById(R.id.textSet2A)
-        set3A = view.findViewById(R.id.textSet3A)
-        set4A = view.findViewById(R.id.textSet4A)
-        set5A = view.findViewById(R.id.textSet5A)
+        // Initialize the UI elements
+        set1A = binding.textSet1A
+        set2A = binding.textSet2A
+        set3A = binding.textSet3A
+        set4A = binding.textSet4A
+        set5A = binding.textSet5A
 
-        set1B = view.findViewById(R.id.textSet1B)
-        set2B = view.findViewById(R.id.textSet2B)
-        set3B = view.findViewById(R.id.textSet3B)
-        set4B = view.findViewById(R.id.textSet4B)
-        set5B = view.findViewById(R.id.textSet5B)
+        set1B = binding.textSet1B
+        set2B = binding.textSet2B
+        set3B = binding.textSet3B
+        set4B = binding.textSet4B
+        set5B = binding.textSet5B
 
         set2A.visibility = View.INVISIBLE
         set3A.visibility = View.INVISIBLE
@@ -150,26 +158,25 @@ class MatchFragment : Fragment() {
         set4B.visibility = View.INVISIBLE
         set5B.visibility = View.INVISIBLE
 
-        ballA = view.findViewById(R.id.ballA)
-        ballB = view.findViewById(R.id.ballB)
+        ballA = binding.ballA
+        ballB = binding.ballB
         ballB.visibility= View.INVISIBLE
 
-        speech = view.findViewById(R.id.imageVolume)
         tts = TTS(requireActivity(), false) // English TTS
 
         currentTextSetA = set1A
         currentTextSetB = set1B
 
-        pointsA = view.findViewById(R.id.textPointsA)
-        pointsB = view.findViewById(R.id.textPointsB)
+        pointsA = binding.textPointsA
+        pointsB = binding.textPointsB
         pointsA.text = "0"
         pointsB.text = "0"
 
         // Receive the data from caller fragment/activity
-        playerNameA = view.findViewById(R.id.textPlayerA)
+        playerNameA = binding.textPlayerA
         playerNameA.text = arguments?.getString("nameA")
 
-        playerNameB = view.findViewById(R.id.textPlayerB)
+        playerNameB = binding.textPlayerB
         playerNameB.text = arguments?.getString("nameB")
 
         servingA = arguments?.getBoolean("serve")!!
@@ -191,20 +198,18 @@ class MatchFragment : Fragment() {
         )
 
         // Reset match
-        val iconRestart = view.findViewById<ImageView>(R.id.imageLoop)
-        iconRestart.setOnClickListener {
+        binding.iconRestart.setOnClickListener {
             Toast.makeText(requireActivity(),
                 "Long press to restart match", Toast.LENGTH_SHORT).show()
         }
 
-        iconRestart.setOnLongClickListener{
+        binding.iconRestart.setOnLongClickListener{
             resetMatch()
             true
         }
 
         // Undo last point
-        val iconUndo = view.findViewById<ImageView>(R.id.imageUndo)
-        iconUndo.setOnClickListener {
+        binding.iconUndo.setOnClickListener {
             if (pointNumber > 1) getPreviousScore()
             else Toast.makeText(
                 requireActivity(),
@@ -213,17 +218,11 @@ class MatchFragment : Fragment() {
             ).show()
         }
 
-        pointsA.setOnClickListener {
-            pointWonByA()
-          }
+        binding.textPointsA.setOnClickListener { pointWonByA() }
 
-        pointsB.setOnClickListener {
-            pointWonByB()
-        }
+        binding.textPointsB.setOnClickListener { pointWonByB() }
 
-        speech.setOnClickListener {
-            mute = !mute
-        }
+        binding.buttonSpeech.setOnClickListener { mute = !mute }
 
         // Initial point
         addPointToHistory()
@@ -561,7 +560,7 @@ class MatchFragment : Fragment() {
         pointsB.visibility = View.INVISIBLE
         ballA.visibility = View.INVISIBLE
         ballB.visibility = View.INVISIBLE
-        imageUndo.visibility = View.INVISIBLE
+        iconUndo.visibility = View.INVISIBLE
     }
 
     @SuppressLint("SetTextI18n")
@@ -680,7 +679,7 @@ class MatchFragment : Fragment() {
         pointsB.visibility = View.INVISIBLE
         ballA.visibility = View.INVISIBLE
         ballB.visibility = View.INVISIBLE
-        imageUndo.visibility = View.INVISIBLE
+        iconUndo.visibility = View.INVISIBLE
     }
 
     private fun nextSet() {
@@ -800,7 +799,7 @@ class MatchFragment : Fragment() {
         pointNumber = 0
         scoreHistory.clear()
         addPointToHistory() // initial point
-        imageUndo.visibility = View.VISIBLE
+        iconUndo.visibility = View.VISIBLE
 
         minScoreToWinGame = 4
 
@@ -821,5 +820,10 @@ class MatchFragment : Fragment() {
         tts.tts.shutdown()
         activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
         super.onDestroy()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

@@ -236,14 +236,14 @@
             android:orientation="horizontal">
 
             <ImageView
-                android:id="@+id/imageUndo"
+                android:id="@+id/iconUndo"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:srcCompat="@drawable/ic_baseline_replay_30"
                 tools:ignore="ContentDescription"/>
 
             <ToggleButton
-                android:id="@+id/imageVolume"
+                android:id="@+id/buttonSpeech"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:layout_marginLeft="50dp"
@@ -253,7 +253,7 @@
                 android:background="@drawable/image_mute" />
 
             <ImageView
-                android:id="@+id/imageLoop"
+                android:id="@+id/iconRestart"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:srcCompat="@drawable/ic_baseline_loop_30"

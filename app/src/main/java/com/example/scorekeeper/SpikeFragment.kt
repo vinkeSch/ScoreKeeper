@@ -5,7 +5,6 @@ import android.content.pm.ActivityInfo
 import android.graphics.Color
 import android.graphics.Typeface
 import android.os.Bundle
-import android.speech.tts.TextToSpeech
 import android.util.Log
 import android.view.*
 import android.widget.ImageView
@@ -14,8 +13,6 @@ import android.widget.Toast
 import android.widget.ToggleButton
 import androidx.fragment.app.Fragment
 import kotlinx.android.synthetic.main.fragment_match.*
-import java.lang.Math.abs
-import java.util.*
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -169,7 +166,7 @@ class SpikeFragment : Fragment()  {
         setIcon()
 
         // Reset match
-        val iconRestart = view.findViewById<ImageView>(R.id.imageLoop)
+        val iconRestart = view.findViewById<ImageView>(R.id.iconRestart)
         iconRestart.setOnClickListener {
             Toast.makeText(requireActivity(), "Long press to restart match", Toast.LENGTH_SHORT).show()
         }
@@ -180,7 +177,7 @@ class SpikeFragment : Fragment()  {
         }
 
         // Undo last point
-        val iconUndo = view.findViewById<ImageView>(R.id.imageUndo)
+        val iconUndo = view.findViewById<ImageView>(R.id.iconUndo)
         iconUndo.setOnClickListener {
             getPreviousScore()
         }
@@ -349,7 +346,7 @@ class SpikeFragment : Fragment()  {
         pointsB.visibility = View.INVISIBLE
         ballA.visibility = View.INVISIBLE
         ballB.visibility = View.INVISIBLE
-        imageUndo.visibility = View.INVISIBLE
+        iconUndo.visibility = View.INVISIBLE
 
         when (currentSet){
             2 -> {
@@ -410,7 +407,7 @@ class SpikeFragment : Fragment()  {
         pointsB.visibility = View.INVISIBLE
         ballA.visibility = View.INVISIBLE
         ballB.visibility = View.INVISIBLE
-        imageUndo.visibility = View.INVISIBLE
+        iconUndo.visibility = View.INVISIBLE
 
         when (currentSet){
             2 -> {
@@ -510,7 +507,7 @@ class SpikeFragment : Fragment()  {
 
         pointNumber = 0
         addPointToHistory() // initial point
-        imageUndo.visibility = View.VISIBLE
+        iconUndo.visibility = View.VISIBLE
 
         Toast.makeText(requireActivity(), "Match restarted", Toast.LENGTH_SHORT).show()
     }
