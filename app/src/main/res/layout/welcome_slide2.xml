@@ -36,8 +36,7 @@
             android:id="@+id/nameB"
             android:layout_width="150dp"
             android:layout_height="wrap_content"
-
-            android:layout_marginBottom="64dp"
+            android:layout_marginBottom="48dp"
             android:backgroundTint="@color/colorB"
             android:hint="@string/nadal"
             android:text=""
