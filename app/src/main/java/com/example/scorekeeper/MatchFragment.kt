@@ -11,7 +11,7 @@ import android.view.*
 import android.widget.*
 import androidx.fragment.app.Fragment
 import com.example.scorekeeper.databinding.FragmentMatchBinding
-import kotlinx.android.synthetic.main.fragment_match.*
+
 import kotlin.math.abs
 
 class MatchFragment : Fragment() {
@@ -560,7 +560,7 @@ class MatchFragment : Fragment() {
         pointsB.visibility = View.INVISIBLE
         ballA.visibility = View.INVISIBLE
         ballB.visibility = View.INVISIBLE
-        iconUndo.visibility = View.INVISIBLE
+        binding.iconUndo.visibility = View.INVISIBLE
     }
 
     @SuppressLint("SetTextI18n")
@@ -679,7 +679,7 @@ class MatchFragment : Fragment() {
         pointsB.visibility = View.INVISIBLE
         ballA.visibility = View.INVISIBLE
         ballB.visibility = View.INVISIBLE
-        iconUndo.visibility = View.INVISIBLE
+        binding.iconUndo.visibility = View.INVISIBLE
     }
 
     private fun nextSet() {
@@ -799,7 +799,7 @@ class MatchFragment : Fragment() {
         pointNumber = 0
         scoreHistory.clear()
         addPointToHistory() // initial point
-        iconUndo.visibility = View.VISIBLE
+        binding.iconUndo.visibility = View.VISIBLE
 
         minScoreToWinGame = 4
 
