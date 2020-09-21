@@ -11,7 +11,6 @@ import android.view.*
 import android.widget.*
 import androidx.fragment.app.Fragment
 import com.example.scorekeeper.databinding.FragmentMatchBinding
-
 import kotlin.math.abs
 
 class MatchFragment : Fragment() {
@@ -53,12 +52,14 @@ class MatchFragment : Fragment() {
     private lateinit var set3A: TextView
     private lateinit var set4A: TextView
     private lateinit var set5A: TextView
+    private lateinit var listSetA: List<TextView>
 
     private lateinit var set1B: TextView
     private lateinit var set2B: TextView
     private lateinit var set3B: TextView
     private lateinit var set4B: TextView
     private lateinit var set5B: TextView
+    private lateinit var listSetB: List<TextView>
 
     private lateinit var ballA: ImageView
     private lateinit var ballB: ImageView
@@ -88,6 +89,7 @@ class MatchFragment : Fragment() {
 
         _binding = FragmentMatchBinding.inflate(inflater, container, false)
         val view = binding.root
+
 
         // Different trigger events that can be sent when a user interacts with a button.
         view.isFocusableInTouchMode = true
@@ -141,22 +143,19 @@ class MatchFragment : Fragment() {
         set3A = binding.textSet3A
         set4A = binding.textSet4A
         set5A = binding.textSet5A
+        listSetA = listOf(set1A,set2A,set3A,set4A,set5A)
 
         set1B = binding.textSet1B
         set2B = binding.textSet2B
         set3B = binding.textSet3B
         set4B = binding.textSet4B
         set5B = binding.textSet5B
+        listSetB = listOf(set1B,set2B,set3B,set4B,set5B)
 
-        set2A.visibility = View.INVISIBLE
-        set3A.visibility = View.INVISIBLE
-        set4A.visibility = View.INVISIBLE
-        set5A.visibility = View.INVISIBLE
-
-        set2B.visibility = View.INVISIBLE
-        set3B.visibility = View.INVISIBLE
-        set4B.visibility = View.INVISIBLE
-        set5B.visibility = View.INVISIBLE
+        for(i in 1..4){ // hide other set scores than the first set
+            listSetA[i].visibility = View.INVISIBLE
+            listSetB[i].visibility = View.INVISIBLE
+        }
 
         ballA = binding.ballA
         ballB = binding.ballB
@@ -219,9 +218,7 @@ class MatchFragment : Fragment() {
         }
 
         binding.textPointsA.setOnClickListener { pointWonByA() }
-
         binding.textPointsB.setOnClickListener { pointWonByB() }
-
         binding.buttonSpeech.setOnClickListener { mute = !mute }
 
         // Initial point
@@ -429,14 +426,14 @@ class MatchFragment : Fragment() {
 
         val diff = gameScoreA - gameScoreB
         if ( diff > 1 && gameScoreA >= minScoreToWinGame ) {
-            gameWonByA()
+            gameWon("A")
             // check if the set has been won
             val matchScoreIsClose = abs(setScoreA - setScoreB) < 2
 
             if (setScoreA == 7 || (!matchScoreIsClose && setScoreA >= 6)) { // won the set
                     setWonByA()
                     if(setsWonA == setsToWinMatch){ // MATCH WON
-                        matchWonByA()
+                        matchWon(binding.textPlayerA.text as String)
                         if (!mute) matchScoreToSpeech()
                     }
                     else { // NEXT SET
@@ -525,9 +522,15 @@ class MatchFragment : Fragment() {
         }
     }
 
-    private fun gameWonByA() {
-        setScoreA++
-        currentTextSetA.text = setScoreA.toString()
+    private fun gameWon(playerName: String) {
+        if (playerName == "A"){
+            setScoreA++
+            currentTextSetA.text = setScoreA.toString()
+        }
+        else { // game won by B
+            setScoreB++
+            currentTextSetB.text = setScoreB.toString()
+        }
         gameScoreA = 0
         pointsA.text = "0"
         gameScoreB = 0
@@ -535,6 +538,17 @@ class MatchFragment : Fragment() {
         // change server
         servingA = !servingA
         setIcon()
+    }
+
+    private fun setIcon(){
+        if (servingA) {
+            ballA.visibility = View.VISIBLE
+            ballB.visibility = View.INVISIBLE
+        }
+        else {
+            ballB.visibility = View.VISIBLE
+            ballA.visibility = View.INVISIBLE
+        }
     }
 
     private fun setWonByA() {
@@ -548,19 +562,6 @@ class MatchFragment : Fragment() {
         setScoreA = 0
         setScoreB = 0
         minScoreToWinGame = 4
-    }
-
-    private fun matchWonByA() {
-        Toast.makeText(
-            requireActivity(),
-            "${playerNameA.text} is the Winner \n $matchScore ",
-            Toast.LENGTH_LONG
-        ).show()
-        pointsA.visibility = View.INVISIBLE
-        pointsB.visibility = View.INVISIBLE
-        ballA.visibility = View.INVISIBLE
-        ballB.visibility = View.INVISIBLE
-        binding.iconUndo.visibility = View.INVISIBLE
     }
 
     @SuppressLint("SetTextI18n")
@@ -605,14 +606,14 @@ class MatchFragment : Fragment() {
 
         val diff = gameScoreB - gameScoreA
         if ( diff > 1 && gameScoreB >= minScoreToWinGame ) {
-            gameWonByB()
+            gameWon("B")
             // check if the set has been won
             val matchScoreIsClose = abs(setScoreA - setScoreB) < 2
             if(setScoreB == 7 || (!matchScoreIsClose && setScoreB >= 6)) {
                 // won the set
                     setWonByB()
                     if(setsWonB == setsToWinMatch){ // MATCH WON
-                        matchWonByB()
+                        matchWon(binding.textPlayerB.text as String)
                         if(!mute) matchScoreToSpeech()
                     }
                     else { // NEXT SET
@@ -644,18 +645,6 @@ class MatchFragment : Fragment() {
         addPointToHistory() //update the score history
     }
 
-    private fun gameWonByB() {
-        setScoreB++
-        currentTextSetB.text = setScoreB.toString()
-        gameScoreB = 0
-        pointsB.text = "0"
-        gameScoreA = 0
-        pointsA.text = "0"
-        // change server
-        servingA = !servingA
-        setIcon()
-    }
-
     private fun setWonByB() {
         currentTextSetB.setTextColor(Color.parseColor("#E9AFA3"))
         currentTextSetB.typeface = Typeface.DEFAULT_BOLD
@@ -669,10 +658,10 @@ class MatchFragment : Fragment() {
         minScoreToWinGame = 4
     }
 
-    private fun matchWonByB() {
+    private fun matchWon(playerName : String) {
         Toast.makeText(
             requireActivity(),
-            "${playerNameB.text} is the Winner \n $matchScore ",
+            "$playerName is the Winner \n $matchScore ",
             Toast.LENGTH_LONG
         ).show()
         pointsA.visibility = View.INVISIBLE
@@ -684,43 +673,10 @@ class MatchFragment : Fragment() {
 
     private fun nextSet() {
         currentSet++
-        when (currentSet){
-            2 -> {
-                currentTextSetA = set2A
-                set2A.visibility = View.VISIBLE
-                currentTextSetB = set2B
-                set2B.visibility = View.VISIBLE
-            }
-            3 -> {
-                currentTextSetA = set3A
-                set3A.visibility = View.VISIBLE
-                currentTextSetB = set3B
-                set3B.visibility = View.VISIBLE
-            }
-            4 -> {
-                currentTextSetA = set4A
-                set4A.visibility = View.VISIBLE
-                currentTextSetB = set4B
-                set4B.visibility = View.VISIBLE
-            }
-            5 -> {
-                currentTextSetA = set5A
-                set5A.visibility = View.VISIBLE
-                currentTextSetB = set5B
-                set5B.visibility = View.VISIBLE
-            }
-        }
-    }
-
-    private fun setIcon(){
-        if (servingA) {
-            ballA.visibility = View.VISIBLE
-            ballB.visibility = View.INVISIBLE
-        }
-        else {
-            ballB.visibility = View.VISIBLE
-            ballA.visibility = View.INVISIBLE
-        }
+        currentTextSetA = listSetA[currentSet-1] // update the current textView for setScore
+        currentTextSetB = listSetB[currentSet-1]
+        listSetA[currentSet-1].visibility = View.VISIBLE // get visible on the scoreboard
+        listSetB[currentSet-1].visibility = View.VISIBLE
     }
 
     private fun resetMatch() {
@@ -736,57 +692,24 @@ class MatchFragment : Fragment() {
         setsWonA = 0
         setsWonB = 0
 
-        set1A.text = "0"
-        set1A.setTextColor(Color.parseColor("#E9ECF5"))
-        set1A.typeface = Typeface.SANS_SERIF
-
-        set2A.text = "0"
-        set2A.setTextColor(Color.parseColor("#E9ECF5"))
-        set2A.typeface = Typeface.SANS_SERIF
-        set2A.visibility = View.INVISIBLE
-
-        set3A.text = "0"
-        set3A.setTextColor(Color.parseColor("#E9ECF5"))
-        set3A.typeface = Typeface.SANS_SERIF
-        set3A.visibility = View.INVISIBLE
-
-        set4A.text = "0"
-        set4A.setTextColor(Color.parseColor("#E9ECF5"))
-        set4A.typeface = Typeface.SANS_SERIF
-        set4A.visibility = View.INVISIBLE
-
-        set5A.text = "0"
-        set5A.setTextColor(Color.parseColor("#E9ECF5"))
-        set5A.typeface = Typeface.SANS_SERIF
-        set5A.visibility = View.INVISIBLE
-
-        set1B.text = "0"
-        set1B.setTextColor(Color.parseColor("#E9ECF5"))
-        set1B.typeface = Typeface.SANS_SERIF
-
-        set2B.text = "0"
-        set2B.setTextColor(Color.parseColor("#E9ECF5"))
-        set2B.typeface = Typeface.SANS_SERIF
-        set2B.visibility = View.INVISIBLE
-
-        set3B.text = "0"
-        set3B.setTextColor(Color.parseColor("#E9ECF5"))
-        set3B.typeface = Typeface.SANS_SERIF
-        set3B.visibility = View.INVISIBLE
-
-        set4B.text = "0"
-        set4B.setTextColor(Color.parseColor("#E9ECF5"))
-        set4B.typeface = Typeface.SANS_SERIF
-        set4B.visibility = View.INVISIBLE
-
-        set5B.text = "0"
-        set5B.setTextColor(Color.parseColor("#E9ECF5"))
-        set5B.typeface = Typeface.SANS_SERIF
-        set5B.visibility = View.INVISIBLE
+        for (item in listSetA) {
+            item.text = "0"
+            item.setTextColor(Color.parseColor("#E9ECF5"))
+            item.typeface = Typeface.SANS_SERIF
+            item.visibility = View.INVISIBLE
+        }
+        for (item in listSetB) {
+            item.text = "0"
+            item.setTextColor(Color.parseColor("#E9ECF5"))
+            item.typeface = Typeface.SANS_SERIF
+            item.visibility = View.INVISIBLE
+        }
 
         currentSet = 1
         currentTextSetA = set1A
         currentTextSetB = set1B
+        listSetA[0].visibility = View.VISIBLE
+        listSetB[0].visibility = View.VISIBLE
 
         pointsA.visibility = View.VISIBLE
         pointsB.visibility = View.VISIBLE

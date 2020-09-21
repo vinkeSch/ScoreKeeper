@@ -15,18 +15,19 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="AllowBackup,LockedOrientationActivity">
+        <activity android:name=".SignInActivity"></activity>
         <activity
             android:name=".SplashActivity"
             android:noHistory="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
             android:name=".MainActivity"
-            android:configChanges="orientation|screenSize|keyboard|keyboardHidden">
-        </activity>
+            android:configChanges="orientation|screenSize|keyboard|keyboardHidden"></activity>
     </application>
 
 </manifest>

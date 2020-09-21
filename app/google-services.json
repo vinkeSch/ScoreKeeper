@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "342968672101",
+    "firebase_url": "https://scorekeeper-3b314.firebaseio.com",
+    "project_id": "scorekeeper-3b314",
+    "storage_bucket": "scorekeeper-3b314.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:342968672101:android:9041e8679b7ece649d0b8c",
+        "android_client_info": {
+          "package_name": "com.example.scorekeeper"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "342968672101-d6e6lu1ctqc3gk065sfup91h3p1c5kpa.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.scorekeeper",
+            "certificate_hash": "cdb2d020cca1fff49a8dad1372d7b65a899d6b13"
+          }
+        },
+        {
+          "client_id": "342968672101-prbnu4pj5rl7joi87nj5c1bs8ouam3p9.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAqdYFIU4RhdUmS6Met51EEJWaUbk7_Mh0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "342968672101-prbnu4pj5rl7joi87nj5c1bs8ouam3p9.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
