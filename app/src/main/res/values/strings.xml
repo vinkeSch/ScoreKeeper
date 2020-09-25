@@ -44,4 +44,28 @@
     <string name="face_player">face_player</string>
     <string name="tennis_ball">tennis_ball</string>
     <string name="tennis_racket">tennis_racket</string>
+
+    <string name="text_sign_in">Sign in</string>
+    <string name="text_sign_in_subtitle">Selamat datang, \nsilahkan masuk untuk melanjutkan</string>
+    <string name="text_hint_email_field">Email</string>
+    <string name="text_hint_password_field">Password</string>
+    <string name="text_btn_forgot_password">Forgot password?</string>
+    <string name="text_btn_sign_in">Sign in</string>
+    <string name="text_or">or</string>
+    <string name="text_not_have_an_account">No account? <b><font color='#3A405A'>Create one!</font></b></string>
+    <string name="text_sign_up_subtitle">Selamat datang, \nbergabunglah bersama kami</string>
+    <string name="text_sign_up_title">Daftar</string>
+    <string name="text_hint_confirm_password_field">Konfirmasi kata sandi</string>
+    <string name="text_privacy_and_policy">Dengan mendaftar Anda berarti menyetujui\n<b><font color='#039BE5'>Kebijakan</font></b> dan <b><font color='#039BE5'>Privasi</font></b></string>
+    <string name="text_btn_sign_up">Daftar</string>
+    <string name="text_have_an_account">Sudah memiliki akun? <b><font color='#039BE5'>Masuk</font></b></string>
+
+    <string name="btn_google_text">Continue with Google</string>
+    <string name="btn_facebook_text">Continue with Facebook</string>
+    <string name="btn_guest_text">Continue as guest</string>
+
+    <string name="web_client_id" translatable="false">342968672101-fo8ao2470rvq4cvrmms564m61pl4nvjp.apps.googleusercontent.com</string>
+
+    <string name="facebook_app_id">924067894784140</string>
+    <string name="fb_login_protocol_scheme">fb924067894784140</string>
 </resources>

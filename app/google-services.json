@@ -15,7 +15,7 @@
       },
       "oauth_client": [
         {
-          "client_id": "342968672101-d6e6lu1ctqc3gk065sfup91h3p1c5kpa.apps.googleusercontent.com",
+          "client_id": "342968672101-p6ptpc9e6ls903tesa5oro94qvike6fd.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.example.scorekeeper",
@@ -36,7 +36,7 @@
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "342968672101-prbnu4pj5rl7joi87nj5c1bs8ouam3p9.apps.googleusercontent.com",
+              "client_id": "342968672101-c18qh93cr130d5spgdm5fo42vg3ehip1.apps.googleusercontent.com",
               "client_type": 3
             }
           ]
