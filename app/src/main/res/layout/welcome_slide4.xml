@@ -19,7 +19,9 @@
         android:text="@string/slide_4_title"
         android:textColor="@android:color/white"
         android:textSize="@dimen/slide_title"
-        android:textStyle="bold" />
+        android:textStyle="bold"
+        android:fontFamily="@font/nunito_sans_bold"/>
+
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -30,7 +32,8 @@
         android:text="@string/slide_4_desc"
         android:textAlignment="center"
         android:textColor="@android:color/white"
-        android:textSize="@dimen/slide_desc" />
+        android:textSize="@dimen/slide_desc"
+        android:fontFamily="@font/nunito_sans_reguler"/>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -40,24 +43,26 @@
 
         <ToggleButton
             android:id="@+id/btnA"
-            android:layout_width="80dp"
-            android:layout_height="80dp"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
             android:layout_gravity="center_vertical"
             android:background="@drawable/toggle_selector_serve_a"
             android:textColor="@color/toggle_text"
-            android:textOn="@string/player_a2"
-            android:textOff="@string/player_a2"/>
+            android:textOn="@string/player_a"
+            android:textOff="@string/player_a"
+            android:fontFamily="@font/nunito_sans_reguler"/>
 
         <ToggleButton
             android:id="@+id/btnB"
-            android:layout_width="80dp"
-            android:layout_height="80dp"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
             android:layout_gravity="center_vertical"
             android:layout_marginStart="24dp"
             android:background="@drawable/toggle_selector_serve_b"
             android:textColor="@color/toggle_text"
-            android:textOn="@string/player_b2"
-            android:textOff="@string/player_b2" />
+            android:textOn="@string/player_b"
+            android:textOff="@string/player_b"
+            android:fontFamily="@font/nunito_sans_reguler"/>
 
     </LinearLayout>
 </LinearLayout>

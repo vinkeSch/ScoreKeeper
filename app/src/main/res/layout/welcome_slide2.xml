@@ -17,6 +17,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/player_b"
+            android:fontFamily="@font/nunito_sans_bold"
             android:textColor="@color/colorB"
             android:textSize="@dimen/slide_title"
             android:textStyle="bold" />
@@ -30,7 +31,8 @@
             android:text="@string/slide_1_desc"
             android:textAlignment="center"
             android:textColor="@android:color/white"
-            android:textSize="@dimen/slide_desc" />
+            android:textSize="@dimen/slide_desc"
+            android:fontFamily="@font/nunito_sans_reguler"/>
 
         <EditText
             android:id="@+id/nameB"
@@ -46,5 +48,6 @@
             android:inputType="textPersonName|textCapWords"
             android:textColor="@color/colorText"
             android:textColorHint="@android:color/darker_gray"
-            android:autofillHints="" />
+            android:autofillHints=""
+            android:fontFamily="@font/nunito_sans_reguler"/>
 </LinearLayout>

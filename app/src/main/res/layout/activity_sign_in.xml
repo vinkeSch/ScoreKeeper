@@ -6,4 +6,249 @@
     android:layout_height="match_parent"
     tools:context=".SignInActivity">
 
+    <FrameLayout
+        android:id="@+id/iv_auth_bg"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:background="@color/colorBackground">
+    </FrameLayout>
+
+    <ImageView
+        android:id="@+id/icon_login"
+        android:layout_width="77dp"
+        android:layout_height="77dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/iv_auth_bg"
+        app:layout_constraintBottom_toBottomOf="@+id/iv_auth_bg"
+        android:src="@drawable/round_sports_tennis_white_48"
+        tools:ignore="ContentDescription" />
+<!--
+
+    <TextView
+        android:id="@+id/tv_auth_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:fontFamily="@font/nunito_sans_bold"
+        android:text="@string/text_sign_in"
+        android:textColor="@color/colorTextORIcon"
+        android:textSize="@dimen/text_title_size"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/icon_login" />
+-->
+
+    <EditText
+        android:id="@+id/et_email_field"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/margin_auth_email_field"
+        android:layout_marginStart="@dimen/margin_auth"
+        android:layout_marginEnd="@dimen/margin_auth"
+        android:padding="@dimen/padding_field"
+        android:background="@drawable/bg_auth_field"
+        android:drawablePadding="@dimen/padding_field"
+        android:drawableStart="@drawable/ic_mail"
+        android:fontFamily="@font/nunito_sans_reguler"
+        android:hint="@string/text_hint_email_field"
+        android:inputType="textEmailAddress"
+        android:textColor="@color/colorBackground"
+        android:textSize="@dimen/text_body_size"
+        android:theme="@style/MyTheme.EditText"
+        android:textColorHint="@color/colorSecondaryText"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/iv_auth_bg"
+        tools:ignore="Autofill" />
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/et_password_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/margin_default"
+        android:layout_marginStart="@dimen/margin_auth"
+        android:layout_marginEnd="@dimen/margin_auth"
+        android:background="@drawable/bg_auth_field"
+        app:passwordToggleEnabled="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/et_email_field"
+        app:hintEnabled="false"
+        app:startIconDrawable="@drawable/ic_password">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/et_password_field"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/nunito_sans_reguler"
+            android:hint="@string/text_hint_password_field"
+            android:inputType="textPassword"
+            android:textColor="@color/colorBackground"
+            android:textColorHint="@color/colorSecondaryText"
+            android:textSize="@dimen/text_body_size"
+            android:theme="@style/MyTheme.EditText"
+            android:background="@null"
+            />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <TextView
+        android:id="@+id/tv_forgot_password"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/margin_default"
+        android:fontFamily="@font/nunito_sans_bold"
+        android:text="@string/text_btn_forgot_password"
+        android:textColor="@color/colorPrimaryDark"
+        android:textSize="@dimen/text_btn_size"
+        app:layout_constraintEnd_toEndOf="@+id/et_password_layout"
+        app:layout_constraintTop_toBottomOf="@+id/et_password_layout" />
+
+    <Button
+        android:id="@+id/btn_sign_in"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_auth"
+        android:layout_marginTop="@dimen/margin_auth"
+        android:layout_marginEnd="@dimen/margin_auth"
+        android:background="@drawable/bg_auth_btn"
+        android:fontFamily="@font/nunito_sans_bold"
+        android:text="@string/text_btn_sign_in"
+        android:textColor="@color/colorTextORIcon"
+        android:textSize="22sp"
+        android:textAllCaps="false"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_forgot_password" />
+
+    <RelativeLayout
+        android:id="@+id/layout_or"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        app:layout_constraintEnd_toEndOf="@+id/btn_sign_in"
+        app:layout_constraintStart_toStartOf="@+id/btn_sign_in"
+        app:layout_constraintTop_toBottomOf="@+id/btn_sign_in">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="@dimen/margin_large"
+            android:layout_toStartOf="@id/text_or"
+            android:background="@android:color/darker_gray"
+            />
+
+        <TextView
+            android:id="@+id/text_or"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:layout_centerHorizontal="true"
+            android:fontFamily="@font/nunito_sans_reguler"
+            android:textColor="@color/colorSecondaryText"
+            android:textSize="@dimen/text_subtitle_size"
+            android:text="@string/text_or" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="@dimen/margin_large"
+            android:layout_toEndOf="@id/text_or"
+            android:background="@android:color/darker_gray"
+            />
+    </RelativeLayout>
+
+    <Button
+        android:id="@+id/btn_google"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_auth"
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="@dimen/margin_auth"
+        android:background="@drawable/btn_login"
+        android:fontFamily="@font/nunito_sans_reguler"
+        android:text="@string/btn_google_text"
+        android:textColor="@color/colorBackground"
+        android:textSize="16sp"
+        android:drawableStart="@drawable/ic_google"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
+        android:textAllCaps="false"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/layout_or"
+        tools:ignore="RtlSymmetry" />
+
+    <Button
+        android:id="@+id/btn_facebook"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_auth"
+        android:layout_marginTop="@dimen/margin_medium"
+        android:layout_marginEnd="@dimen/margin_auth"
+        android:background="@drawable/btn_login"
+        android:fontFamily="@font/nunito_sans_reguler"
+        android:text="@string/btn_facebook_text"
+        android:textColor="@color/colorBackground"
+        android:textSize="16sp"
+        android:drawableStart="@drawable/btn_facebook"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
+        android:textAllCaps="false"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btn_google"
+        tools:ignore="RtlSymmetry" />
+
+    <com.facebook.login.widget.LoginButton
+        android:id="@+id/btn_facebook2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="30dp"
+        android:layout_marginBottom="30dp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btn_facebook"/>
+
+    <Button
+        android:id="@+id/btn_guest"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_auth"
+        android:layout_marginTop="@dimen/margin_medium"
+        android:layout_marginEnd="@dimen/margin_auth"
+        android:background="@drawable/btn_login"
+        android:fontFamily="@font/nunito_sans_reguler"
+        android:text="@string/btn_guest_text"
+        android:textColor="@color/colorBackground"
+        android:textSize="16sp"
+        android:drawableStart="@drawable/ic_round_person_outline_24"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
+        android:textAllCaps="false"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btn_facebook2"
+        tools:ignore="RtlSymmetry" />
+
+    <TextView
+        android:id="@+id/tv_not_have_account"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/margin_default"
+        android:fontFamily="@font/nunito_sans_reguler"
+        android:text="@string/text_not_have_an_account"
+        android:textColor="@color/colorBackground"
+        android:textSize="@dimen/text_btn_size"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

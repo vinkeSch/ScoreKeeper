@@ -23,7 +23,8 @@
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center">
+                android:layout_gravity="center"
+                tools:ignore="UseCompoundDrawables">
 
                 <TextView
                     android:id="@+id/textPlayerA"
@@ -34,7 +35,7 @@
                     android:layout_marginBottom="16dp"
                     android:autofillHints=""
                     android:background="@null"
-                    android:fontFamily="sans-serif-medium"
+                    android:fontFamily="@font/nunito_sans_bold"
                     android:inputType=""
                     android:text="@string/player_a"
                     android:textColor="#99B2DD"
@@ -60,7 +61,8 @@
                 android:text="@string/zero"
                 android:textAlignment="center"
                 android:textColor="#99B2DD"
-                android:textSize="140sp" />
+                android:textSize="140sp"
+                android:fontFamily="@font/nunito_sans_bold"/>
 
         </LinearLayout>
 
@@ -77,7 +79,7 @@
                 android:id="@+id/textSet1A"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:fontFamily="sans-serif"
+                android:fontFamily="@font/nunito_sans_reguler"
                 android:text="@string/zero"
                 android:textColor="@color/colorText"
                 android:textSize="30sp" />
@@ -86,6 +88,7 @@
                 android:id="@+id/textSet2A"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:fontFamily="@font/nunito_sans_reguler"
                 android:text="@string/zero"
                 android:textColor="#E9ECF5"
                 android:textSize="30sp" />
@@ -94,6 +97,7 @@
                 android:id="@+id/textSet3A"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:fontFamily="@font/nunito_sans_reguler"
                 android:text="@string/zero"
                 android:textColor="#E9ECF5"
                 android:textSize="30sp" />
@@ -102,6 +106,7 @@
                 android:id="@+id/textSet4A"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:fontFamily="@font/nunito_sans_reguler"
                 android:text="@string/zero"
                 android:textColor="#E9ECF5"
                 android:textSize="30sp" />
@@ -112,6 +117,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/zero"
                 android:textColor="#E9ECF5"
+                android:fontFamily="@font/nunito_sans_reguler"
                 android:textSize="30sp" />
         </LinearLayout>
 
@@ -138,6 +144,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/zero"
+                android:fontFamily="@font/nunito_sans_reguler"
                 android:textColor="#E9ECF5"
                 android:textSize="30sp" />
 
@@ -145,7 +152,7 @@
                 android:id="@+id/textSet2B"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:fontFamily="sans-serif"
+                android:fontFamily="@font/nunito_sans_reguler"
                 android:text="@string/zero"
                 android:textColor="@color/colorText"
                 android:textSize="30sp" />
@@ -154,6 +161,7 @@
                 android:id="@+id/textSet3B"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:fontFamily="@font/nunito_sans_reguler"
                 android:text="@string/zero"
                 android:textColor="#E9ECF5"
                 android:textSize="30sp" />
@@ -162,6 +170,7 @@
                 android:id="@+id/textSet4B"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:fontFamily="@font/nunito_sans_reguler"
                 android:text="@string/zero"
                 android:textColor="#E9ECF5"
                 android:textSize="30sp" />
@@ -170,6 +179,7 @@
                 android:id="@+id/textSet5B"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:fontFamily="@font/nunito_sans_reguler"
                 android:text="@string/zero"
                 android:textColor="#E9ECF5"
                 android:textSize="30sp" />
@@ -186,7 +196,8 @@
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center">
+                android:layout_gravity="center"
+                tools:ignore="UseCompoundDrawables">
 
                 <TextView
                     android:id="@+id/textPlayerB"
@@ -197,7 +208,7 @@
                     android:layout_marginBottom="16dp"
                     android:autofillHints=""
                     android:background="@null"
-                    android:fontFamily="sans-serif-medium"
+                    android:fontFamily="@font/nunito_sans_bold"
                     android:inputType=""
                     android:text="@string/player_b"
                     android:textColor="#E9AFA3"
@@ -222,7 +233,8 @@
                 android:text="@string/zero"
                 android:textAlignment="center"
                 android:textColor="#E9AFA3"
-                android:textSize="140sp" />
+                android:textSize="140sp"
+                android:fontFamily="@font/nunito_sans_bold"/>
 
 
         </LinearLayout>

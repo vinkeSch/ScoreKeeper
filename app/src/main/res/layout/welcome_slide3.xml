@@ -19,55 +19,57 @@
             android:text="@string/slide_3_title"
             android:textColor="@color/colorC"
             android:textSize="@dimen/slide_title"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:fontFamily="@font/nunito_sans_bold"/>
     <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="36dp"
             android:layout_marginBottom="36dp"
-            android:paddingLeft="@dimen/desc_padding"
-            android:paddingRight="@dimen/desc_padding"
             android:text="@string/slide_3_desc"
             android:textAlignment="center"
             android:textColor="@android:color/white"
-            android:textSize="@dimen/slide_desc" />
+            android:textSize="@dimen/slide_desc"
+            android:fontFamily="@font/nunito_sans_reguler"/>
 
     <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="48dp"
-            android:gravity="center_horizontal">
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="48dp"
+    android:gravity="center_horizontal">
+        <ToggleButton
+            android:id="@+id/btn1"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_gravity="center_vertical"
+            android:background="@drawable/toggle_selector_intro"
+            android:textColor="@color/toggle_text"
+            android:textOn="@string/_1_set"
+            android:textOff="@string/_1_set"
+            android:fontFamily="@font/nunito_sans_reguler"/>
 
         <ToggleButton
-                android:id="@+id/btn1"
-                android:layout_width="70dp"
-                android:layout_height="70dp"
-                android:layout_gravity="center_vertical"
-                android:background="@drawable/toggle_selector_intro"
-                android:textColor="@color/toggle_text"
-                android:textOn="@string/_1_set"
-                android:textOff="@string/_1_set"/>
+            android:id="@+id/btn3"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="24dp"
+            android:layout_marginEnd="24dp"
+            android:background="@drawable/toggle_selector_intro"
+            android:textColor="@color/toggle_text"
+            android:textOn="@string/_3_sets"
+            android:textOff="@string/_3_sets"
+            android:fontFamily="@font/nunito_sans_reguler"/>
 
         <ToggleButton
-                android:id="@+id/btn3"
-                android:layout_width="70dp"
-                android:layout_height="70dp"
-                android:layout_gravity="center_vertical"
-                android:layout_marginStart="24dp"
-                android:layout_marginEnd="24dp"
-                android:background="@drawable/toggle_selector_intro"
-                android:textColor="@color/toggle_text"
-                android:textOn="@string/_3_sets"
-                android:textOff="@string/_3_sets" />
-
-            <ToggleButton
-                android:id="@+id/btn5"
-                android:layout_width="70dp"
-                android:layout_height="70dp"
-                android:layout_gravity="center_vertical"
-                android:background="@drawable/toggle_selector_intro"
-                android:textColor="@color/toggle_text"
-                android:textOn="@string/_5_sets"
-                android:textOff="@string/_5_sets" />
-        </LinearLayout>
+            android:id="@+id/btn5"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_gravity="center_vertical"
+            android:background="@drawable/toggle_selector_intro"
+            android:textColor="@color/toggle_text"
+            android:textOn="@string/_5_sets"
+            android:textOff="@string/_5_sets"
+            android:fontFamily="@font/nunito_sans_reguler"/>
+    </LinearLayout>
 </LinearLayout>
