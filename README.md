@@ -10,6 +10,7 @@ Keep track of the score during the match! Let's play!
 * Landscape orientation for better visualization
 * Match reset option
 * Score by voice after each point/game/set
+* User sign in with Google & Facebook
 
 ## Screenshots
 ![Screenshot](Screenshots/Match_score.jpg)
