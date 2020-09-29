@@ -48,6 +48,7 @@ class MainActivity :  AppCompatActivity(), NavigationHost {
     private var numberOfSets : Int = 0
 
     private lateinit var binding: ActivityMainBinding
+    private lateinit var userUID: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -61,6 +62,9 @@ class MainActivity :  AppCompatActivity(), NavigationHost {
             R.layout.welcome_slide3,
             R.layout.welcome_slide4
         )
+
+        val b = intent.extras
+        if (b != null) userUID = b.getString("userUID").toString()
 
         addBottomDots(0) // adding bottom dots
 
@@ -82,8 +86,10 @@ class MainActivity :  AppCompatActivity(), NavigationHost {
                 binding.viewPager.currentItem = current
             } else {
                 if(!btn1.isChecked && !btn3.isChecked && !btn5.isChecked) { // no sets selected
-                    Toast.makeText(this, "Shall we play 1, 3 or 5 sets?",
-                        Toast.LENGTH_LONG).show()
+                    Toast.makeText(
+                        this, "Shall we play 1, 3 or 5 sets?",
+                        Toast.LENGTH_LONG
+                    ).show()
                     binding.viewPager.currentItem = 2 // sets selection page
                 }
                 else launchMatchScreen(savedInstanceState)
@@ -229,12 +235,13 @@ class MainActivity :  AppCompatActivity(), NavigationHost {
         // Pass data to fragment
         val args = Bundle()
         // Send string data as key value format
-        args.putBoolean("serve",false)
+        args.putBoolean("serve", false)
         if (nameA.text.isNullOrEmpty()) args.putString("nameA", "Player A")
         else args.putString("nameA", nameA.text.toString())
         if (nameB.text.isNullOrEmpty()) args.putString("nameB", "Player B")
         else args.putString("nameB", nameB.text.toString())
         args.putInt("sets", getNumberOfSets())
+        args.putString("userUID", userUID)
 
         val fragment: Fragment = MatchFragment()
         fragment.arguments = args
@@ -276,12 +283,12 @@ class MainActivity :  AppCompatActivity(), NavigationHost {
                     }
                 }
                 3 -> { // 1st player to serve
-                    if(!btnA.isChecked && !btnB.isChecked) binding.btnNext.visibility = View.GONE
-                    if(btnA.isChecked) {
+                    if (!btnA.isChecked && !btnB.isChecked) binding.btnNext.visibility = View.GONE
+                    if (btnA.isChecked) {
                         binding.btnNext.setImageResource(R.drawable.round_sports_baseball_white_24)
                         binding.btnNext.setBackgroundResource(R.drawable.rounded_corners_btn_next_a)
                     }
-                    if(btnB.isChecked) {
+                    if (btnB.isChecked) {
                         binding.btnNext.setImageResource(R.drawable.round_sports_baseball_white_24)
                         binding.btnNext.setBackgroundResource(R.drawable.rounded_corners_btn_next_b)
                     }
@@ -303,8 +310,7 @@ class MainActivity :  AppCompatActivity(), NavigationHost {
                             binding.btnNext.visibility = View.VISIBLE
                             binding.btnNext.setImageResource(R.drawable.round_sports_baseball_white_24)
                             binding.btnNext.setBackgroundResource(R.drawable.rounded_corners_btn_next_a)
-                        }
-                        else {
+                        } else {
                             binding.btnNext.visibility = View.GONE
                             binding.btnNext.setImageResource(R.drawable.ic_round_keyboard_arrow_right_24)
                             binding.btnNext.setBackgroundResource(R.drawable.rounded_corners_btn_next)
@@ -316,8 +322,7 @@ class MainActivity :  AppCompatActivity(), NavigationHost {
                             binding.btnNext.visibility = View.VISIBLE
                             binding.btnNext.setImageResource(R.drawable.round_sports_baseball_white_24)
                             binding.btnNext.setBackgroundResource(R.drawable.rounded_corners_btn_next_b)
-                        }
-                        else {
+                        } else {
                             binding.btnNext.visibility = View.GONE
                             binding.btnNext.setImageResource(R.drawable.ic_round_keyboard_arrow_right_24)
                             binding.btnNext.setBackgroundResource(R.drawable.rounded_corners_btn_next)

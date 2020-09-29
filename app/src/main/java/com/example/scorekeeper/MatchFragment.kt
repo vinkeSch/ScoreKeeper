@@ -14,6 +14,13 @@ import android.widget.Toast
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import com.example.scorekeeper.databinding.FragmentMatchBinding
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.ValueEventListener
+import com.google.firebase.database.ktx.database
+import com.google.firebase.database.ktx.getValue
+import com.google.firebase.ktx.Firebase
 import kotlin.math.abs
 
 class MatchFragment : Fragment() {
@@ -84,6 +91,9 @@ class MatchFragment : Fragment() {
 
     private lateinit var typefaceNunitoBold : Typeface
     private lateinit var typefaceNunitoReg : Typeface
+
+    private lateinit var database: DatabaseReference
+    private lateinit var userUID: String
 
     @SuppressLint("SetTextI18n")
     override fun onCreateView(
@@ -188,6 +198,8 @@ class MatchFragment : Fragment() {
         servingA = arguments?.getBoolean("serve")!!
         setIcon()
 
+        userUID = arguments!!.getString("userUID").toString()
+
         when(arguments?.getInt("sets")!!) {
             1 -> setsToWinMatch = 1
             3 -> setsToWinMatch = 2
@@ -232,6 +244,8 @@ class MatchFragment : Fragment() {
 
         // Initial point
         addPointToHistory()
+
+        database = Firebase.database.reference
 
         return view
     }
@@ -706,6 +720,32 @@ class MatchFragment : Fragment() {
         ballA.visibility = View.INVISIBLE
         ballB.visibility = View.INVISIBLE
         binding.iconUndo.visibility = View.INVISIBLE
+
+        // add +1 match played to user
+        addMatchToHistory()
+    }
+
+    private fun addMatchToHistory() {
+        database.child("users").child(userUID).child("matchesPlayed").addListenerForSingleValueEvent(object :
+            ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                if(dataSnapshot.exists()){ // the user exists
+                    var matchesPlayed = (dataSnapshot.value.toString()).toInt()
+                    matchesPlayed++
+                    database.child("users").child(userUID)
+                        .child("matchesPlayed").setValue(matchesPlayed)
+                    Toast.makeText(
+                        requireActivity(),
+                        "Match played added",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                TODO("Not yet implemented")
+            }
+        })
     }
 
     private fun nextSet() {

@@ -24,12 +24,18 @@ import com.google.android.gms.common.api.ApiException
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.*
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.ValueEventListener
+import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 
 
 class SignInActivity : AppCompatActivity(), View.OnClickListener {
 
     private lateinit var auth: FirebaseAuth
+    private lateinit var database: DatabaseReference
 
     private lateinit var binding: ActivitySignInBinding
 
@@ -58,6 +64,7 @@ class SignInActivity : AppCompatActivity(), View.OnClickListener {
 
         googleSignInClient = GoogleSignIn.getClient(this, gso)
 
+        database = Firebase.database.reference
         // Initialize Firebase Auth
         auth = Firebase.auth
 
@@ -111,11 +118,14 @@ class SignInActivity : AppCompatActivity(), View.OnClickListener {
                         baseContext, "Login success",
                         Toast.LENGTH_SHORT
                     ).show()
-                    startActivity(Intent(this@SignInActivity, MainActivity::class.java))
+                    //startActivity(Intent(this@SignInActivity, MainActivity::class.java))
+                    startMain(user!!.uid)
                 } else {
                     if(task.exception is FirebaseAuthUserCollisionException) // User with this email already exists
-                        Toast.makeText(this,
-                            "User with this email already exists.", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            this,
+                            "User with this email already exists.", Toast.LENGTH_SHORT
+                        ).show()
                     else Toast.makeText(
                         baseContext, "Authentication failed.",
                         Toast.LENGTH_SHORT
@@ -147,7 +157,8 @@ class SignInActivity : AppCompatActivity(), View.OnClickListener {
                         baseContext, "Login success",
                         Toast.LENGTH_SHORT
                     ).show()
-                    startActivity(Intent(this@SignInActivity, MainActivity::class.java))
+                    //startActivity(Intent(this@SignInActivity, MainActivity::class.java))
+                    startMain(user!!.uid)
                 } else {
                     // If sign in fails, display a message to the user.
                     Log.w(TAG, "signInWithEmail:failure", task.exception)
@@ -160,6 +171,16 @@ class SignInActivity : AppCompatActivity(), View.OnClickListener {
             }
     }
 
+    private fun startMain(userUID: String) {
+        val intent = Intent(this@SignInActivity, MainActivity::class.java)
+        val b = Bundle()
+        b.putString("userUID", userUID) //Your id
+
+        intent.putExtras(b) //Put your id to your next Intent
+
+        startActivity(intent)
+    }
+
     private fun signOut() {
         auth.signOut()
         LoginManager.getInstance().logOut()
@@ -168,7 +189,35 @@ class SignInActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     private fun updateUI(user: FirebaseUser?) {
+        user?.let {
+            // The user's ID, unique to the Firebase project. Do NOT use this value to
+            // authenticate with your backend server, if you have one. Use
+            // FirebaseUser.getToken() instead.
+            val uid = user.uid
+            println("USER ID: $uid")
 
+            database.child("users").child(uid).addListenerForSingleValueEvent(object :
+                ValueEventListener {
+                override fun onDataChange(dataSnapshot: DataSnapshot) {
+                    if (dataSnapshot.exists()) { // the user exists
+                        val matchesPlayed = dataSnapshot.child("matchesPlayed").value
+                        Toast.makeText(
+                            baseContext, "Matches played: $matchesPlayed",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    } else { // create new user
+                        database.child("users").child(uid).child("email").setValue(user.email)
+                        database.child("users").child(uid).child("matchesPlayed").setValue(0)
+                    }
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    TODO("Not yet implemented")
+                }
+
+
+            })
+        }
     }
 
     private fun validateForm(): Boolean {
@@ -229,8 +278,9 @@ class SignInActivity : AppCompatActivity(), View.OnClickListener {
                         baseContext, "Login success. Hello ${auth.currentUser?.displayName}",
                         Toast.LENGTH_SHORT
                     ).show()
+                    startMain(user!!.uid)
+                    //startActivity(Intent(this@SignInActivity, MainActivity::class.java))
                     signOut()
-                    startActivity(Intent(this@SignInActivity, MainActivity::class.java))
                 } else {
                     // If sign in fails, display a message to the user.
                     Log.w(TAG, "signInWithCredential:failure", task.exception)
@@ -281,7 +331,8 @@ class SignInActivity : AppCompatActivity(), View.OnClickListener {
                         Toast.LENGTH_SHORT
                     ).show()
                     signOut()
-                    startActivity(Intent(this@SignInActivity, MainActivity::class.java))
+                    startMain(user!!.uid)
+                    //startActivity(Intent(this@SignInActivity, MainActivity::class.java))
                 } else {
                     // If sign in fails, display a message to the user.
                     Log.w(TAG, "signInAnonymously:failure", task.exception)
@@ -311,8 +362,9 @@ class SignInActivity : AppCompatActivity(), View.OnClickListener {
                         baseContext, "Login success. Hello ${auth.currentUser?.displayName}",
                         Toast.LENGTH_SHORT
                     ).show()
+                    startMain(user!!.uid)
+                    //startActivity(Intent(this@SignInActivity, MainActivity::class.java))
                     signOut()
-                    startActivity(Intent(this@SignInActivity, MainActivity::class.java))
                 } else {
                     // If sign in fails, display a message to the user.
                     Log.w(TAG, "signInWithCredential:failure", task.exception)
@@ -332,9 +384,11 @@ class SignInActivity : AppCompatActivity(), View.OnClickListener {
         val emailAddress = binding.etEmailField.text.toString()
         if (TextUtils.isEmpty(emailAddress)) {
             binding.etEmailField.error = "Required."
-            Snackbar.make(binding.root,
+            Snackbar.make(
+                binding.root,
                 "Please indicate your email",
-                Snackbar.LENGTH_LONG).show()
+                Snackbar.LENGTH_LONG
+            ).show()
         } else {
             binding.etEmailField.error = null
             auth.sendPasswordResetEmail(emailAddress)
@@ -342,9 +396,11 @@ class SignInActivity : AppCompatActivity(), View.OnClickListener {
                     if (task.isSuccessful) {
                         Log.d(TAG, "Email sent.")
                         hideKeyboard()
-                        Snackbar.make(binding.root,
+                        Snackbar.make(
+                            binding.root,
                             "Email sent! Check your inbox to reset your password",
-                            Snackbar.LENGTH_LONG).show()
+                            Snackbar.LENGTH_LONG
+                        ).show()
                     }
                 }
         }
