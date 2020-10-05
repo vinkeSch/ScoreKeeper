@@ -1,7 +1,10 @@
 package com.example.scorekeeper
 
+import android.Manifest
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.content.pm.ActivityInfo
+import android.content.pm.PackageManager
 import android.graphics.Color
 import android.graphics.Typeface
 import android.os.Bundle
@@ -11,16 +14,19 @@ import android.view.*
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import com.example.scorekeeper.databinding.FragmentMatchBinding
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
-import com.google.firebase.database.ktx.getValue
 import com.google.firebase.ktx.Firebase
+import java.text.SimpleDateFormat
+import java.util.*
 import kotlin.math.abs
 
 class MatchFragment : Fragment() {
@@ -30,6 +36,7 @@ class MatchFragment : Fragment() {
     private var scoreVoiceMap = mapOf<String, String>()
 
     private var matchScore = ""
+    private var matchScoreB = ""
 
     private var gameScoreA = 0
     private var gameScoreB = 0
@@ -44,6 +51,7 @@ class MatchFragment : Fragment() {
     private var isTiebreak = false
     private var currentSet = 1
     private var servingA = false
+    private var winnerA = false
 
     private var minScoreToWinGame = 4
     private var setsToWinMatch = 2 // By default 3-set match is played
@@ -94,6 +102,10 @@ class MatchFragment : Fragment() {
 
     private lateinit var database: DatabaseReference
     private lateinit var userUID: String
+
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
+    private var latitude : Double = 0.0
+    private var longitude : Double = 0.0
 
     @SuppressLint("SetTextI18n")
     override fun onCreateView(
@@ -247,7 +259,74 @@ class MatchFragment : Fragment() {
 
         database = Firebase.database.reference
 
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(context!!)
+        getLastKnownLocation()
         return view
+    }
+
+    /**
+     * call this method for receive location
+     * get location and give callback when successfully retrieve
+     * function itself check location permission before access related methods
+     *
+     */
+    private fun getLastKnownLocation() {
+        if(ContextCompat.checkSelfPermission(context!!, Manifest.permission.ACCESS_FINE_LOCATION)
+            == PackageManager.PERMISSION_GRANTED) {
+
+            // You can use the API that requires the permission.
+            fusedLocationClient.lastLocation.addOnSuccessListener { location->
+                if (location != null) {
+                    // use your location object
+                    // get latitude , longitude and other info from this
+                    latitude = location.latitude
+                    longitude = location.longitude
+                    println("LOCATION: $latitude, $longitude")
+                }
+            }
+        }
+        else {
+            // Location permission has not been granted.
+            println("Location permission NOT GRANTED")
+
+            if(shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION))
+                Toast.makeText(context!!,
+                    "Location permission is needed to save the match location",
+                    Toast.LENGTH_SHORT).show()
+
+            // Request Location permission
+            requestPermissions(
+                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                LOCATION_PERMISSION_REQUEST_CODE)
+
+        }
+    }
+
+    @SuppressLint("MissingPermission")
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        when(requestCode){
+            LOCATION_PERMISSION_REQUEST_CODE -> {
+                if( grantResults[0] == PackageManager.PERMISSION_GRANTED ) {
+                    Log.i(tag,"Agree location permission")
+                    // You can use the API that requires the permission.
+                    fusedLocationClient.lastLocation.addOnSuccessListener { location->
+                        if (location != null) {
+                            // use your location object
+                            // get latitude , longitude and other info from this
+                            latitude = location.latitude
+                            longitude = location.longitude
+                            println("LOCATION: $latitude, $longitude")
+                        }
+                    }
+                }
+                else {
+                    Log.i(tag,"Not agree location permission")
+                    Toast.makeText(context!!,
+                        "Location permission was not granted",
+                        Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
     }
 
     private fun getPreviousScore(){
@@ -460,6 +539,7 @@ class MatchFragment : Fragment() {
             if (setScoreA == 7 || (!matchScoreIsClose && setScoreA >= 6)) { // won the set
                     setWonByA()
                     if(setsWonA == setsToWinMatch){ // MATCH WON
+                        winnerA = true
                         matchWon(binding.textPlayerA.text as String)
                         if (!mute) matchScoreToSpeech()
                     }
@@ -605,6 +685,7 @@ class MatchFragment : Fragment() {
         currentTextSetA.typeface = typefaceNunitoBold
         setsWonA++
         matchScore += "${setScoreA}-${setScoreB} "
+        matchScoreB += "${setScoreB}-${setScoreA} "
         isTiebreak = false
         setOldB = setScoreB
         setOldA = setScoreA
@@ -662,6 +743,7 @@ class MatchFragment : Fragment() {
                 // won the set
                     setWonByB()
                     if(setsWonB == setsToWinMatch){ // MATCH WON
+                        winnerA = false
                         matchWon(binding.textPlayerB.text as String)
                         if(!mute) matchScoreToSpeech()
                     }
@@ -701,6 +783,7 @@ class MatchFragment : Fragment() {
         currentTextSetB.typeface = typefaceNunitoBold
         setsWonB++
         matchScore += "${setScoreA}-${setScoreB} "
+        matchScoreB += "${setScoreB}-${setScoreA} "
         isTiebreak = false
         setOldB = setScoreB
         setOldA = setScoreA
@@ -710,42 +793,103 @@ class MatchFragment : Fragment() {
     }
 
     private fun matchWon(playerName: String) {
-        Toast.makeText(
-            requireActivity(),
-            "$playerName is the Winner \n $matchScore ",
-            Toast.LENGTH_LONG
-        ).show()
-        pointsA.visibility = View.INVISIBLE
+
+        if (!winnerA) {
+            matchScore = matchScoreB
+        }
+
         pointsB.visibility = View.INVISIBLE
+        pointsA.visibility = View.INVISIBLE
         ballA.visibility = View.INVISIBLE
         ballB.visibility = View.INVISIBLE
         binding.iconUndo.visibility = View.INVISIBLE
 
         // add +1 match played to user
-        addMatchToHistory()
-    }
+        addMatchToFirebase()
 
-    private fun addMatchToHistory() {
-        database.child("users").child(userUID).child("matchesPlayed").addListenerForSingleValueEvent(object :
-            ValueEventListener {
-            override fun onDataChange(dataSnapshot: DataSnapshot) {
-                if(dataSnapshot.exists()){ // the user exists
-                    var matchesPlayed = (dataSnapshot.value.toString()).toInt()
-                    matchesPlayed++
-                    database.child("users").child(userUID)
-                        .child("matchesPlayed").setValue(matchesPlayed)
-                    Toast.makeText(
-                        requireActivity(),
-                        "Match played added",
-                        Toast.LENGTH_SHORT
-                    ).show()
+        MaterialAlertDialogBuilder(context!!, R.style.AlertDialogTheme)
+            .setTitle("$playerName is the winner!")
+            .setBackground(ContextCompat.getDrawable(context!!, R.drawable.btn_login))
+            .setIcon(ContextCompat.getDrawable(context!!, R.drawable.ic_round_emoji_events_48))
+            .setCancelable(false)
+            .setMessage(matchScore)
+            .setNeutralButton(resources.getString(R.string.exit)) { dialog, which ->
+                // Respond to exit button press
+                activity?.finishAffinity()
+            }
+            .setNegativeButton(resources.getString(R.string.stats)) { dialog, which ->
+                // Respond to stats button press
+            }
+            .setPositiveButton(resources.getString(R.string.new_match)) { dialog, which ->
+                // Respond to new match button press
+                activity?.let{
+                    val intent = Intent (it, MainActivity::class.java)
+                    val b = Bundle()
+                    b.putString("userUID", userUID) //Your id
+                    intent.putExtras(b)
+                    startActivity(intent)
                 }
             }
+            .create()
+            .show()
+    }
 
-            override fun onCancelled(error: DatabaseError) {
-                TODO("Not yet implemented")
-            }
-        })
+    private fun getCurrentDate() : String{
+        return SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(Date())
+    }
+
+    private fun addMatchToFirebase() { // add to match history in Firebase
+        val matchesRef: DatabaseReference =
+            database.child("users").child(userUID)
+                .child("matches").push()
+        val map: MutableMap<String, Any> = HashMap()
+        map["date"] = getCurrentDate()
+
+        val mapPlayerA: MutableMap<String, Any> = HashMap()
+        mapPlayerA["name"] = playerNameA.text
+        mapPlayerA["set1"] = set1A.text
+        mapPlayerA["set2"] = set2A.text
+        mapPlayerA["set3"] = set3A.text
+        mapPlayerA["set4"] = set4A.text
+        mapPlayerA["set5"] = set5A.text
+        mapPlayerA["winner"] = winnerA
+
+        val mapPlayerB: MutableMap<String, Any> = HashMap()
+        mapPlayerB["name"] = playerNameB.text
+        mapPlayerB["set1"] = set1B.text
+        mapPlayerB["set2"] = set2B.text
+        mapPlayerB["set3"] = set3B.text
+        mapPlayerB["set4"] = set4B.text
+        mapPlayerB["set5"] = set5B.text
+        mapPlayerB["winner"] = !winnerA
+
+        map["playerA"] = mapPlayerA
+        map["playerB"] = mapPlayerB
+
+
+        val mapLocation: MutableMap<String, Any> = HashMap()
+        mapLocation["latitude"] = latitude
+        mapLocation["longitude"] = longitude
+
+        map["location"] = mapLocation
+
+        matchesRef.updateChildren(map)
+/*        database.child("users").child(userUID).child("matchesPlayed").addListenerForSingleValueEvent(
+            object :
+                ValueEventListener {
+                override fun onDataChange(dataSnapshot: DataSnapshot) {
+                    if (dataSnapshot.exists()) { // the user exists
+                        var matchesPlayed = (dataSnapshot.value.toString()).toInt()
+                        matchesPlayed++
+                        database.child("users").child(userUID)
+                            .child("matchesPlayed").setValue(matchesPlayed)
+                    }
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    TODO("Not yet implemented")
+                }
+            })*/
     }
 
     private fun nextSet() {
@@ -795,6 +939,7 @@ class MatchFragment : Fragment() {
         servingA = true
 
         matchScore = ""
+        matchScoreB = ""
 
         pointNumber = 0
         scoreHistory.clear()
@@ -825,5 +970,14 @@ class MatchFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    companion object {
+        /**
+         * Request code for location permission request.
+         *
+         * @see .onRequestPermissionsResult
+         */
+        private const val LOCATION_PERMISSION_REQUEST_CODE = 1
     }
 }

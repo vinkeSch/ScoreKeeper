@@ -143,8 +143,9 @@ class SignInActivity : AppCompatActivity(), View.OnClickListener {
         if (!validateForm()) {
             return
         }
+        // trim email & password from blank spaces
 
-        auth.signInWithEmailAndPassword(email, password)
+        auth.signInWithEmailAndPassword(email.trim(), password)
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
                     // Sign in success, update UI with the signed-in user's information
@@ -200,14 +201,10 @@ class SignInActivity : AppCompatActivity(), View.OnClickListener {
                 ValueEventListener {
                 override fun onDataChange(dataSnapshot: DataSnapshot) {
                     if (dataSnapshot.exists()) { // the user exists
-                        val matchesPlayed = dataSnapshot.child("matchesPlayed").value
-                        Toast.makeText(
-                            baseContext, "Matches played: $matchesPlayed",
-                            Toast.LENGTH_SHORT
-                        ).show()
+
                     } else { // create new user
-                        database.child("users").child(uid).child("email").setValue(user.email)
-                        database.child("users").child(uid).child("matchesPlayed").setValue(0)
+                        database.child("users").child(uid)
+                            .child("email").setValue(user.email)
                     }
                 }
 
@@ -295,7 +292,7 @@ class SignInActivity : AppCompatActivity(), View.OnClickListener {
         when (v.id) {
             R.id.tv_not_have_account -> {
                 createAccount(
-                    binding.etEmailField.text.toString(),
+                    binding.etEmailField.text.toString().trim(),
                     binding.etPasswordField.text.toString()
                 )
             }
