@@ -38,8 +38,9 @@
         <item>@color/dot_dark_screen4</item>
     </array>
 
-
     <color name="colorTextORIcon">#FFFFFF</color>
     <color name="colorDivider">#EBEBEB</color>
     <color name="colorSecondaryText">#757575</color>
+
+    <color name="transparent">#00000000</color>
 </resources>

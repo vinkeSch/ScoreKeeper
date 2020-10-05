@@ -68,4 +68,11 @@
 
     <string name="facebook_app_id">924067894784140</string>
     <string name="fb_login_protocol_scheme">fb924067894784140</string>
+    <string name="continue_btn">Continue</string>
+    <string name="win">WIN</string>
+
+    <string name="supporting_text">Please select one of the options</string>
+    <string name="new_match">New match</string>
+    <string name="stats">Stats</string>
+    <string name="exit">Exit</string>
 </resources>
