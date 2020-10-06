@@ -118,7 +118,6 @@ class SignInActivity : AppCompatActivity(), View.OnClickListener {
                         baseContext, "Login success",
                         Toast.LENGTH_SHORT
                     ).show()
-                    //startActivity(Intent(this@SignInActivity, MainActivity::class.java))
                     startMain(user!!.uid)
                 } else {
                     if(task.exception is FirebaseAuthUserCollisionException) // User with this email already exists
@@ -158,7 +157,6 @@ class SignInActivity : AppCompatActivity(), View.OnClickListener {
                         baseContext, "Login success",
                         Toast.LENGTH_SHORT
                     ).show()
-                    //startActivity(Intent(this@SignInActivity, MainActivity::class.java))
                     startMain(user!!.uid)
                 } else {
                     // If sign in fails, display a message to the user.
@@ -180,6 +178,7 @@ class SignInActivity : AppCompatActivity(), View.OnClickListener {
         intent.putExtras(b) //Put your id to your next Intent
 
         startActivity(intent)
+        finish()
     }
 
     private fun signOut() {
@@ -276,7 +275,6 @@ class SignInActivity : AppCompatActivity(), View.OnClickListener {
                         Toast.LENGTH_SHORT
                     ).show()
                     startMain(user!!.uid)
-                    //startActivity(Intent(this@SignInActivity, MainActivity::class.java))
                     signOut()
                 } else {
                     // If sign in fails, display a message to the user.
@@ -329,7 +327,6 @@ class SignInActivity : AppCompatActivity(), View.OnClickListener {
                     ).show()
                     signOut()
                     startMain(user!!.uid)
-                    //startActivity(Intent(this@SignInActivity, MainActivity::class.java))
                 } else {
                     // If sign in fails, display a message to the user.
                     Log.w(TAG, "signInAnonymously:failure", task.exception)
@@ -360,7 +357,6 @@ class SignInActivity : AppCompatActivity(), View.OnClickListener {
                         Toast.LENGTH_SHORT
                     ).show()
                     startMain(user!!.uid)
-                    //startActivity(Intent(this@SignInActivity, MainActivity::class.java))
                     signOut()
                 } else {
                     // If sign in fails, display a message to the user.
