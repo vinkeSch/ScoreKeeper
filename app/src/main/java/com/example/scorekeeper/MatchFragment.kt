@@ -164,7 +164,7 @@ class MatchFragment : Fragment() {
             false
         })
 
-        activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+        //activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
 
         // Initialize the UI elements
         set1A = binding.textSet1A
@@ -803,6 +803,8 @@ class MatchFragment : Fragment() {
         ballA.visibility = View.INVISIBLE
         ballB.visibility = View.INVISIBLE
         binding.iconUndo.visibility = View.INVISIBLE
+        binding.iconRestart.visibility = View.INVISIBLE
+        binding.buttonSpeech.visibility = View.INVISIBLE
 
         // add +1 match played to user
         addMatchToFirebase()
@@ -827,6 +829,7 @@ class MatchFragment : Fragment() {
                     val b = Bundle()
                     b.putString("userUID", userUID) //Your id
                     intent.putExtras(b)
+                    activity!!.finish()
                     startActivity(intent)
                 }
             }
@@ -945,6 +948,8 @@ class MatchFragment : Fragment() {
         scoreHistory.clear()
         addPointToHistory() // initial point
         binding.iconUndo.visibility = View.VISIBLE
+        binding.iconRestart.visibility = View.VISIBLE
+        binding.buttonSpeech.visibility = View.VISIBLE
 
         minScoreToWinGame = 4
 
